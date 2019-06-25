@@ -15,7 +15,11 @@
   <depend package="dummy-dependency-n" />
   -->
   <depend package="base/types" />
-  <depend package="base/orogen/types" />
-  <depend package="orogen" />
+  <depend package="base/orogen/types"/>
+  <depend package="orogen"/>
   <depend package="slam/orogen/envire" />
+  <!--
+  <depend package="/usr/include/python3.5m"/>
+  <depend package="/usr/lib/python3/dist-packages/numpy/core/include/numpy"/>
+	-->
 </package>
