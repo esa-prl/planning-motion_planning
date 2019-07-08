@@ -28,6 +28,23 @@ PyObject* MotionPlanning::initPython(char* pyName)
 	return pModule;
 }
 
+void runPyFunction(char pyFunctionName[], PyObject *pModule, double xm, double ym, double xr, double yr, double initHeading)
+{
+
+	PyObject *func = PyObject_GetAttrString(pModule, pyFunctionName);
+	PyObject *args,*value;
+
+	args = PyTuple_New(5);
+	PyTuple_SetItem(args,0,PyFloat_FromDouble(xm));
+	PyTuple_SetItem(args,1,PyFloat_FromDouble(ym));
+	PyTuple_SetItem(args,2,PyFloat_FromDouble(xr));
+	PyTuple_SetItem(args,3,PyFloat_FromDouble(yr));
+	PyTuple_SetItem(args,4,PyFloat_FromDouble(initHeading));
+	PyObject_CallObject(func,args);
+
+	return;
+}
+
 void MotionPlanning::sizePyArray( int &size, char pyVariableName[],  PyObject *pModule)
 {
 
