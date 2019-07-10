@@ -5,7 +5,7 @@ using namespace MotionPlanning_lib;
 PyObject* MotionPlanning::initPython(char* pyName)
 {
 
-	std::cout<<"Loading python file named '"<<pyName<<"'..."<<std::endl;
+	std::cout<<"Loading python file named '"<<pyName<<"'...";
     PyObject *pName, *pModule;
 
 
@@ -19,28 +19,34 @@ PyObject* MotionPlanning::initPython(char* pyName)
     Py_DECREF(pName);
 
     if (pModule != NULL) {
-		std::cout<<"...correctly loaded"<<std::endl;
+		std::cout<<" done"<<std::endl;
 	}	
 	else {
         PyErr_Print();
-        fprintf(stderr, "...failed to load \n");
+        fprintf(stderr, "failed to load \n");
     }
 	return pModule;
 }
 
-void runPyFunction(char pyFunctionName[], PyObject *pModule, double xm, double ym, double xr, double yr, double initHeading)
+void MotionPlanning::runPyFunction(char pyFunctionName[], PyObject *pModule, double xm, double ym, double xr, double yr, double initHeading, char mapDirectory[])
 {
 
 	PyObject *func = PyObject_GetAttrString(pModule, pyFunctionName);
-	PyObject *args,*value;
-
-	args = PyTuple_New(5);
+	PyObject *args;
+	
+	std::cout<<"Running function '"<<pyFunctionName<<"'..."<<std::endl;
+	args = PyTuple_New(6);
 	PyTuple_SetItem(args,0,PyFloat_FromDouble(xm));
 	PyTuple_SetItem(args,1,PyFloat_FromDouble(ym));
 	PyTuple_SetItem(args,2,PyFloat_FromDouble(xr));
 	PyTuple_SetItem(args,3,PyFloat_FromDouble(yr));
 	PyTuple_SetItem(args,4,PyFloat_FromDouble(initHeading));
-	PyObject_CallObject(func,args);
+	PyTuple_SetItem(args,5,PyUnicode_FromString(mapDirectory));
+	
+	if (!PyObject_CallObject(func,args))
+		std::cout<<"... ERROR when calling function "<<pyFunctionName<<std::endl;
+	else
+		std::cout<<"... done"<<std::endl;
 
 	return;
 }

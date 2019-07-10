@@ -18,7 +18,7 @@ namespace MotionPlanning_lib
     {
         public: 
 			PyObject* initPython(char* pyName);
-			void runPyFunction(char pyFunctionName[], PyObject *pModule, double xm, double ym, double xr, double yr, double initHeading);
+			void runPyFunction(char pyFunctionName[], PyObject *pModule, double xm, double ym, double xr, double yr, double initHeading, char mapDirectory[]);
 			void sizePyArray( int &size, char pyVariableName[],  PyObject *pModule);
 			void returnPyArrayDouble(int nDim, char pyVariableName[], double* &dVariable, PyObject *pModule);
 			void returnPyArrayInt(int nDim, char pyVariableName[], int* &iVariable, PyObject *pModule);
