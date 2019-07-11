@@ -28,20 +28,22 @@ PyObject* MotionPlanning::initPython(char* pyName)
 	return pModule;
 }
 
-void MotionPlanning::runPyFunction(char pyFunctionName[], PyObject *pModule, double xm, double ym, double xr, double yr, double initHeading, char mapDirectory[])
+void MotionPlanning::runPyFunction(char pyFunctionName[], PyObject *pModule, double xm, double ym, double xr, double yr, double initHeading, char mapDirectory[], double resolution, double size)
 {
 
 	PyObject *func = PyObject_GetAttrString(pModule, pyFunctionName);
 	PyObject *args;
 	
 	std::cout<<"Running function '"<<pyFunctionName<<"'..."<<std::endl;
-	args = PyTuple_New(6);
+	args = PyTuple_New(8);
 	PyTuple_SetItem(args,0,PyFloat_FromDouble(xm));
 	PyTuple_SetItem(args,1,PyFloat_FromDouble(ym));
 	PyTuple_SetItem(args,2,PyFloat_FromDouble(xr));
 	PyTuple_SetItem(args,3,PyFloat_FromDouble(yr));
 	PyTuple_SetItem(args,4,PyFloat_FromDouble(initHeading));
 	PyTuple_SetItem(args,5,PyUnicode_FromString(mapDirectory));
+	PyTuple_SetItem(args,6,PyFloat_FromDouble(resolution));
+	PyTuple_SetItem(args,7,PyFloat_FromDouble(size));
 	
 	if (!PyObject_CallObject(func,args))
 		std::cout<<"... ERROR when calling function "<<pyFunctionName<<std::endl;
