@@ -1086,7 +1086,7 @@ def main(xm,ym,xr,yr,initialHeading,mapDirectory,resolution,size):
 	with open(str(mapDirectory)+'Ys.txt','r') as file:
 		Ys = array([[float(num) for num in line.split(',')] for line in file])"""
 	
-	with open(str(mapDirectory)+'Zs.txt','r') as file:
+	with open(str(mapDirectory)+'PRL_DEM.txt','r') as file:
 		Zs = array([[float(num) for num in line.split(',')] for line in file])
 	
 
@@ -1178,7 +1178,7 @@ def main(xm,ym,xr,yr,initialHeading,mapDirectory,resolution,size):
 	# 	Slope threshold
 	# =============================================================================
 
-	obstMap[slope>0.25] = 1  #0.419 for ETUMA
+	obstMap[slope>0.20] = 1  #0.419 for ETUMA
 	obstMap[0,:] = 0
 	obstMap[-1,:] = 0
 	obstMap[:,0] = 0
