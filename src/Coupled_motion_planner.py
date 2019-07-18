@@ -1111,7 +1111,7 @@ def main(xm,ym,xr,yr,initialHeading,mapDirectory,resolution,size):
 	# =============================================================================
 	roverPos = [xr,yr]
 
-	qinitial = [math.pi/2,0,-3*math.pi/4,0,0]
+	qinitial = [math.pi/2,0,-2.21,0,0]
 	rxm = int(round(xr/resolution-1))
 	rym = int(round(yr/resolution-1))
 	roverNode = [rxm,rym]
