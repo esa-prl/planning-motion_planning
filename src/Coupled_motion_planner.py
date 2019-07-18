@@ -16,10 +16,10 @@ import cv2
 import FastMarching.FastMarching as FM
 import FastMarching.FastMarching3D as FM3D
 
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-from matplotlib.ticker import LinearLocator, FormatStrFormatter
-from matplotlib import cm
+#import matplotlib.pyplot as plt
+#from mpl_toolkits.mplot3d import Axes3D
+#from matplotlib.ticker import LinearLocator, FormatStrFormatter
+#from matplotlib import cm
 
 epsilon = sys.float_info.epsilon
 
