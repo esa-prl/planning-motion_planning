@@ -6,8 +6,8 @@
 #include <base/samples/Frame.hpp>
 #include <base/Waypoint.hpp>
 
-#include <python3.5m/Python.h>
-#include <python3.5m/numpy/arrayobject.h>
+#include <Python.h>
+#include <numpy/arrayobject.h>
 #include <iostream>
 #include <vector>
 #include <cmath>
@@ -16,7 +16,7 @@ namespace MotionPlanning_lib
 {
     class MotionPlanning
     {
-        public: 
+        public:
 			PyObject* initPython(char* pyName);
 			void runPyFunction(char pyFunctionName[], PyObject *pModule, double xm, double ym, double xr, double yr, double initHeading, char mapDirectory[], double resolution, double size);
 			void sizePyArray( int &size, char pyVariableName[],  PyObject *pModule);
@@ -27,4 +27,4 @@ namespace MotionPlanning_lib
 
 } // end namespace coupled_motion_planner
 
-#endif 
+#endif
