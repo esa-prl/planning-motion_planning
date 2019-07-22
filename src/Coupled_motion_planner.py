@@ -835,7 +835,7 @@ def MCI(position,orientation,elbow):
     # Checking first joint limits
     elif theta1 < math.pi/2-100*math.pi/180 or theta1 > math.pi/2+20*math.pi/180:
         unreachable = 1
-        print('The first joint limit has been reached')
+        print('The first joint limit has been reached, theta 1:' + str(theta1))
 
     # Second joint facts
     # Checking second joint limits
