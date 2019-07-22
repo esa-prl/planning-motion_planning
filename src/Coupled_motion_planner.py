@@ -460,11 +460,12 @@ def plotArm(axis,q,pos,heading):
     Tw4 = dot(Tw0,dot(T01,np.dot(T12,dot(T23,T34))))
     Tw5 = dot(Tw0,dot(T01,np.dot(T12,dot(T23,dot(T34,T45)))))
 
-    px=[[Tw0[0][3]],[Tw1[0][3]],[Tw2[0][3]],[Tw3[0][3]],[Tw4[0][3]],[Tw5[0][3]]]
-    py=[[Tw0[1][3]],[Tw1[1][3]],[Tw2[1][3]],[Tw3[1][3]],[Tw4[1][3]],[Tw5[1][3]]]
-    pz=[[Tw0[2][3]],[Tw1[2][3]],[Tw2[2][3]],[Tw3[2][3]],[Tw4[2][3]],[Tw5[2][3]]]
+    px=[Tw0[0][3],Tw1[0][3],Tw2[0][3],Tw3[0][3],Tw4[0][3],Tw5[0][3]]
+    py=[Tw0[1][3],Tw1[1][3],Tw2[1][3],Tw3[1][3],Tw4[1][3],Tw5[1][3]]
+    pz=[Tw0[2][3],Tw1[2][3],Tw2[2][3],Tw3[2][3],Tw4[2][3],Tw5[2][3]]
 
-    axis.scatter3D(px,py,pz,'r',marker='x',s=20)
+    axis.scatter3D(px,py,pz,'red',marker='x',s=20)
+    axis.plot3D(px,py,pz,'red')
 
 
 def traslation(p):
@@ -791,7 +792,7 @@ def MCI(position,orientation,elbow):
         theta3 = 2*math.pi - (math.pi + delta)
     else:
         theta2 = gamma - beta
-        theta3 = 2*math.pi - (math.pi + delta)
+        theta3 = 2*math.pi - (math.pi - delta)
 
     # Wrist joint is obtained in function of the position ones
     theta4 = (alpha-theta2-theta3)
@@ -831,12 +832,17 @@ def MCI(position,orientation,elbow):
         unreachable = 1
         print('The objective is very close to the first joint')
 
-    # If the first joint will crash with the wheel
-    elif theta1 < math.pi/2-99*math.pi/180 or theta1>math.pi/2+20*math.pi/180:
+    # Checking first joint limits
+    elif theta1 < math.pi/2-100*math.pi/180 or theta1 > math.pi/2+20*math.pi/180:
         unreachable = 1
         print('The first joint limit has been reached')
 
     # Second joint facts
+    # Checking second joint limits
+    #elif theta2 < math.pi/2-180*math.pi/180 or theta2 > math.pi/2+180*math.pi/180:
+        #unreachable = 1
+        #print('The second joint limit has been reached')
+
     # If the second joint is touching the rovers body
     elif T02[2][3] <= 0:
         unreachable = 1
@@ -853,6 +859,11 @@ def MCI(position,orientation,elbow):
         print('The second joint will crash with the right-front wheel')
 
     # Third joint facts
+    # Checking third joint limits
+    #elif theta3 < 0 or theta3 > 2*math.pi:
+        #unreachable = 1
+        #print('The third joint limit has been reached')
+
     # If the third joint is touching the rovers body
     elif T03[2][3] <= 0:
         unreachable = 1
@@ -872,6 +883,12 @@ def MCI(position,orientation,elbow):
     elif (T03[2][3] <= 0.11) and (T03[1][3] >= 0.35):
         unreachable = 1
         print('The third joint will crash with the left-front wheel')
+
+    # Fourth joint facts
+    # Checking fourth joint limits
+    #elif theta4 < math.pi/2-180*math.pi/180 or theta4 > math.pi/2+180*math.pi/180:
+        #unreachable = 1
+        #print('The fourth joint limit has been reached')
 
     # If the wrist is too close to the first joint
     elif (np.abs(rw) <= 0.01) and (zw <= d1 + 0.01):
@@ -905,7 +922,7 @@ def MCI(position,orientation,elbow):
     if unreachable == 0:
         joints = [theta1,theta2,theta3,theta4,theta5]
     else:
-        joints = np.nan
+        joints = [np.nan,np.nan,np.nan,np.nan,np.nan]
 
     return joints
 
@@ -999,8 +1016,10 @@ def PathInverseKinematics(assignment,gamma3D,finalBasePath,finalBaseHeading,qi,R
         joints[i,:] = MCI([xc,yc,zc],[rz1,ry,rz2],elbow)
         unreachable = 0
         for j in range(0,len(qi)):
-            if joints[i,j]>math.pi:
+            if joints[i,j] > math.pi:
                 joints[i,j] = joints[i,j] - 2*math.pi
+            elif joints[i,j] < -math.pi:
+                joints[i,j] = joints[i,j] + 2*math.pi
             if np.isnan(joints[i,j]):
                 unreachable = 1
 
@@ -1037,15 +1056,15 @@ def angularSmooth(angles):
 def smoothJoints(joints,times,qend):
 
     m,n = joints.shape
-    joints[-1,:] = qend
     ajoints = angularSmooth(joints)
     tJoints = np.zeros_like(ajoints)
 
     for i in range(0,n):
         fj = interpolate.interp1d(range(0,m),ajoints[:,i])
         tJoints[:,i] = fj(times*(m-1)/times[-1])
-        tJoints[:,i] = signal.savgol_filter(tJoints[:,i], 51, 3)
-        tJoints[:,i] = signal.savgol_filter(tJoints[:,i], 3, 2)
+        #tJoints[:,i] = signal.savgol_filter(tJoints[:,i], 51, 3)
+        #tJoints[:,i] = signal.savgol_filter(tJoints[:,i], 3, 2)
+        tJoints[:,i] = ndimage.gaussian_filter1d(tJoints[:,i], 4)
 
 
 
@@ -1223,7 +1242,7 @@ def main(xm,ym,xr,yr,initialHeading,mapDirectory,resolution,size):
 	# =============================================================================
 
 
-	obstacleHighCost = obstMap*150
+	obstacleHighCost = obstMap*300
 
 	# =============================================================================
 	#     Dilated cost map based on distance to the nearest obstacles
@@ -1238,7 +1257,7 @@ def main(xm,ym,xr,yr,initialHeading,mapDirectory,resolution,size):
 	minDist = np.min(obstDist[obstDist>0])
 	obstDist[obstDist>0] = obstDist[obstDist>0] - minDist
 
-	gradient = 150
+	gradient = 10
 
 	obstDilatedHighCost = obstDist*gradient
 
@@ -1250,14 +1269,14 @@ def main(xm,ym,xr,yr,initialHeading,mapDirectory,resolution,size):
 
 
 
-	h = np.ones((35,35))/35**2
+	h = np.ones((50,50))/50**2
 
-	cMap = signal.convolve2d(cMap, np.flipud(h), mode='same',fillvalue=150)
+	cMap = signal.convolve2d(cMap, np.flipud(h), mode='same',fillvalue=300)
 
 	cMap[0,:] = np.inf
 	cMap[-1,:] = np.inf
-	cMap[:,1] = np.inf
-	cMap[:,-2] = np.inf
+	cMap[:,0] = np.inf
+	cMap[:,-1] = np.inf
 
 	# =============================================================================
 	#     Fast marching method
@@ -1328,19 +1347,7 @@ def main(xm,ym,xr,yr,initialHeading,mapDirectory,resolution,size):
 
 	realBaseHeading = roverHeading(realBasePath,heading,resolution,Zs)
 
-
-
-	"""# Contour plot cost map
-	fig, ax = plt.subplots()
-	cs = ax.contourf(Xs, Ys, cMap.T,15)
-	plt.plot(roverPath[:,0],roverPath[:,1])
-	plt.plot(realBasePath[:,0],realBasePath[:,1])
-	ax.set_aspect('equal')
-	fig.colorbar(cs, ax=ax, shrink=0.9)
-	plt.show()
-
-
-	# Contour plot time map
+	"""# Contour plot time map
 	fig, ax = plt.subplots()
 	TmapG[np.isinf(TmapG)] = 0
 	TmapS[np.isinf(TmapS)] = 0
@@ -1358,8 +1365,10 @@ def main(xm,ym,xr,yr,initialHeading,mapDirectory,resolution,size):
 	plt.show()
 
 	# Surf plot obstacles
+	Zsm = Zs
+	Zsm[Zs<7.25]=8
 	m,n = Xs.shape
-	colors = np.empty(Xs.shape,dtype=str)
+	colors = np.empty(Xsm.shape,dtype=str)
 	for y in range(0,n):
 		for x in range(0,m):
 		    if obstMap[x,y] == 1:
@@ -1368,8 +1377,9 @@ def main(xm,ym,xr,yr,initialHeading,mapDirectory,resolution,size):
 		        colors[x, y] = 'b'
 	fig = plt.figure()
 	ax = fig.gca(projection='3d')
-	ax.plot_surface(Xs, Ys, Zs,rstride=2, cstride=2, facecolors = colors, cmap = 'RdBu')
+	ax.plot_surface(Xs, Ys, Zsm,rstride=2, cstride=2, cmap = 'RdBu')
 	ax.set_aspect('equal')
+	ax.set_zlim([7.25,8.25])
 	plt.show()"""
 
 
@@ -1401,18 +1411,19 @@ def main(xm,ym,xr,yr,initialHeading,mapDirectory,resolution,size):
 	distCost = np.zeros(len(subPath))
 	for i in range(0,len(subPath)):
 		d = np.linalg.norm(subPath[i,:]-[xm,ym,zm])
-		if d < rlim:
-			distCost[i] = np.inf
-		elif d > Rlim:
-			distCost[i] = np.inf
+		baseOrientation = np.arctan2((ym-subPath[i,1])/d,(xm-subPath[i,0])/d)
+		if baseOrientation-subPathHeading[i,2] < math.pi/2 and baseOrientation-subPathHeading[i,2] > 0:
+			if d < rlim:
+				distCost[i] = np.inf
+			elif d > Rlim:
+				distCost[i] = np.inf
+			else:
+				distCost[i] = 1/((rO+Rm)/2)**2*(d-((rO+Rm)/2))**2
 		else:
-			distCost[i] = 1/((rO+Rm)/2)**2*(d-((rO+Rm)/2))**2
+			distCost[i] = np.inf
 
+	distCost[distCost!=np.inf] = distCost[distCost!=np.inf]/np.max(distCost[distCost!=np.inf])
 
-	if np.max(distCost)==0:
-		distCost = np.inf+distCost
-	else:
-		distCost = distCost/np.max(distCost)
 	# =============================================================================
 	#     Cost in function of the position of the wheels
 	# =============================================================================
@@ -1455,10 +1466,11 @@ def main(xm,ym,xr,yr,initialHeading,mapDirectory,resolution,size):
 	headingCost = np.zeros(len(subPath))
 	for i in range(0,len(subPath)):
 		roverCenterPos = roverPath[-len(subPath)+i,:]
+		roverCenterHeading = heading[-len(subPath)+i]
 		d = np.linalg.norm([roverCenterPos[0],roverCenterPos[1]]-array([xm,ym]))
 		bestOrientation = np.arctan2((ym-roverCenterPos[1])/d,(xm-roverCenterPos[0])/d)
 
-		headingCost[i] = np.abs(subPathHeading[i,2]-bestOrientation)
+		headingCost[i] = np.abs(roverCenterHeading-bestOrientation)
 
 
 	headingCost = headingCost/np.max(headingCost)
@@ -1477,7 +1489,8 @@ def main(xm,ym,xr,yr,initialHeading,mapDirectory,resolution,size):
 
 	if np.isinf(minCost):
 		index = np.inf
-		print('The sample is not reachable')
+		print('ERROR: The sample is not reachable')
+		return 0
 
 	# =============================================================================
 	#     else:
@@ -1503,7 +1516,7 @@ def main(xm,ym,xr,yr,initialHeading,mapDirectory,resolution,size):
 	# =============================================================================
 	#     Final elbow position (up/down)
 	# =============================================================================
-	zm = zm+0.05
+	zm = zm+0.10
 
 	if zm>finalBasePath[-1,2]-zbase:
 		ryf = np.arctan2(Nz[sampleNode[1],sampleNode[0]],np.linalg.norm([Nx[sampleNode[1],sampleNode[0]],Ny[sampleNode[1],sampleNode[0]]]))
@@ -1519,7 +1532,7 @@ def main(xm,ym,xr,yr,initialHeading,mapDirectory,resolution,size):
 		qid = [-math.pi/2,-1.6422,1.459,2.796,0]  # Initial configuration after deployment
 	else:
 		elbow = 0
-		qid = [-math.pi/2,-0.6721,1.459,2.796,0]  # Initial configuration after deployment
+		qid = [-math.pi/2,-0.6721,-0.5,-0.3456,0]  # Initial configuration after deployment
 		ryf = -ryf%(2*math.pi)
 
 
@@ -1531,12 +1544,24 @@ def main(xm,ym,xr,yr,initialHeading,mapDirectory,resolution,size):
 
 
 	qend = MCI(baseSampleDistance,baseSampleOrientation,elbow)
-
-
+	if np.isnan(qend[0]):
+		print('ERROR: The final configuration will lead into collision. The sample is not reachable')
+		return 0
 
 	"""# Contour plot obst map
 	fig, ax = plt.subplots()
 	cs = ax.contourf(Xs, Ys, obstMap)
+	plt.plot(finalRoverPath[:,0],finalRoverPath[:,1])
+	plt.plot(finalBasePath[:,0],finalBasePath[:,1])
+	plt.scatter(xm,ym,color='red',marker='x')
+	plt.scatter(xr,yr,color='green')
+	ax.set_aspect('equal')
+	fig.colorbar(cs, ax=ax, shrink=0.9)
+	plt.show()
+
+	# Contour plot cost map
+	fig, ax = plt.subplots()
+	cs = ax.contourf(Xs, Ys, cMap.T,80)
 	plt.plot(finalRoverPath[:,0],finalRoverPath[:,1])
 	plt.plot(finalBasePath[:,0],finalBasePath[:,1])
 	plt.scatter(xm,ym,color='red',marker='x')
@@ -1746,24 +1771,17 @@ def main(xm,ym,xr,yr,initialHeading,mapDirectory,resolution,size):
 
 	#gamma3D = np.vstack((np.flipud(pathS),pathG))
 
-	gamma3D[:,0] = signal.savgol_filter(gamma3D[:,0], 15, 3)*resX
-	gamma3D[:,1] = signal.savgol_filter(gamma3D[:,1], 15, 3)*resY
-	gamma3D[:,2] = signal.savgol_filter(gamma3D[:,2], 15, 3)*resZ
+	gamma3D[:,0] = gamma3D[:,0]*resX
+	gamma3D[:,1] = gamma3D[:,1]*resY
+	gamma3D[:,2] = gamma3D[:,2]*resZ
 
-	"""# Surf plot fetching configuration
-	xMap= np.linspace(0,aX,sX)
-	yMap= np.linspace(0,aY,sY)
-	x,y = np.meshgrid(xMap,yMap)
+	gamma3D[:,0] = signal.savgol_filter(gamma3D[:,0], 15, 3)
+	gamma3D[:,1] = signal.savgol_filter(gamma3D[:,1], 15, 3)
+	gamma3D[:,2] = signal.savgol_filter(gamma3D[:,2], 15, 3)
 
-	fig = plt.figure()
-	ax = fig.gca(projection='3d')
-	ax.scatter3D(gamma3D[:,0],gamma3D[:,1],gamma3D[:,2],'g',30)
-	plotArm(ax,qend,effectorBasePath[-1,:],effectorBaseHeading[-1,:])
-	#ax.plot_surface(x,y, ZsMap,rstride=2, cstride=2, cmap = 'RdBu')
-	ax.set_aspect('equal','datalim')
-	plt.show()"""
-
-
+	#gamma3D[:,0] = ndimage.gaussian_filter1d(gamma3D[:,0], 10)
+	#gamma3D[:,1] = ndimage.gaussian_filter1d(gamma3D[:,1], 10)
+	#gamma3D[:,2] = ndimage.gaussian_filter1d(gamma3D[:,2], 10)
 
 
 	effectorBasePath[:,0] = effectorBasePath[:,0]+Xmin
@@ -1774,6 +1792,8 @@ def main(xm,ym,xr,yr,initialHeading,mapDirectory,resolution,size):
 	gamma3D[:,1] = gamma3D[:,1]+Ymin
 	gamma3D[:,2] = gamma3D[:,2]+Zmin
 
+	gamma3D[-1,:] = [xm,ym,zm]
+
 	resizedGamma3D = np.zeros([len(finalBasePath)-index+1,3])
 
 	fx = interpolate.interp1d(range(0,len(gamma3D)),gamma3D[:,0])
@@ -1783,6 +1803,12 @@ def main(xm,ym,xr,yr,initialHeading,mapDirectory,resolution,size):
 	resizedGamma3D[:,1] = fy(np.linspace(0,len(gamma3D)-1,len(finalBasePath)-index+1,endpoint=True))
 	resizedGamma3D[:,2] = fz(np.linspace(0,len(gamma3D)-1,len(finalBasePath)-index+1,endpoint=True))
 
+
+
+    # =============================================================================
+    #     Relation between end effector path and rover path
+    # =============================================================================
+
 	global assignment
 	assignment = assign(resizedGamma3D,effectorBasePath,rO,Rm,Rlim)
 
@@ -1790,10 +1816,6 @@ def main(xm,ym,xr,yr,initialHeading,mapDirectory,resolution,size):
 
 	joints = np.vstack((joints[range(0,index-1),:],effectorJoints))
 	assignment = np.hstack((array(range(0,index-1)),assignment+index-1))
-
-
-
-
 
 	r = np.zeros([len(finalBasePath),1])
 	for i in range(1,len(finalBasePath)):
@@ -1815,25 +1837,56 @@ def main(xm,ym,xr,yr,initialHeading,mapDirectory,resolution,size):
 	global finalJoints
 	finalJoints = smoothJoints(joints,tj,qend)
 
-
 	"""# Plot joints
 	fig, ax = plt.subplots()
-	plt.plot(tj,finalJoints)
-	plt.show()"""
-
-
-
+	plt.plot(tj,finalJoints[:,0],label='First joint')
+	plt.plot(tj,finalJoints[:,1],label='Second joint')
+	plt.plot(tj,finalJoints[:,2],label='Third joint')
+	plt.plot(tj,finalJoints[:,3],label='Fourth joint')
+	plt.plot(tj,finalJoints[:,4],label='Fifth joint')
+	plt.show()
+	plt.legend()
 	assignment = np.int32(assignment)
 
+
+    # Surf plot fetching configuration
+	xMap= np.linspace(0,aX,sX)
+	yMap= np.linspace(0,aY,sY)
+	x,y = np.meshgrid(xMap,yMap)
+
+	fig = plt.figure()
+	ax = fig.gca(projection='3d')
+	ax.scatter3D(resizedGamma3D[:,0],resizedGamma3D[:,1],resizedGamma3D[:,2],'g',30)
+	ax.scatter3D(effectorBasePath[-1,0],effectorBasePath[-1,1],effectorBasePath[-1,2],marker='+',s=50)
+	#plotArm(ax,qinitial,effectorBasePath[-1,:],effectorBaseHeading[-1,:])
+	#for i in range(0,len(effectorBasePath),15):
+		#plotArm(ax,effectorJoints[i,:],effectorBasePath[i,:],effectorBaseHeading[i,:])
+	plotArm(ax,qend,effectorBasePath[-1,:],effectorBaseHeading[-1,:])
+	ax.plot3D(resizedGamma3D[:,0],resizedGamma3D[:,1],resizedGamma3D[:,2], 'blue')
+	ax.plot_surface(x+Xmin,y+Ymin, ZsMap+Zmin,rstride=5, cstride=5, cmap = 'RdBu')
+	ax.set_aspect('equal')
+	plt.show()
+
+	# Plot everything together
+	fig = plt.figure()
+	ax = fig.gca(projection='3d')
+	ax.plot3D(finalRoverPath[:,0],finalRoverPath[:,1],finalRoverPath[:,2],'blue')
+	ax.plot3D(finalBasePath[:,0],finalBasePath[:,1],finalBasePath[:,2],'orange')
+	for i in range(0,len(finalBasePath),10):
+		plotArm(ax,finalJoints[i,:],finalBasePath[i,:],finalBaseHeading[i,:])
+	plotArm(ax,finalJoints[-1,:],finalBasePath[-1,:],finalBaseHeading[-1,:])
+	ax.plot3D(resizedGamma3D[:,0],resizedGamma3D[:,1],resizedGamma3D[:,2], 'green')
+	ax.scatter3D(xm,ym,zm,marker='x',s=50)
+	#ax.plot_surface(Xs,Ys,Zsm,rstride=5, cstride=5, cmap = 'RdBu')
+	ax.set_aspect('equal')
+	plt.show()"""
+
 	elapsedTime = time()-startTime
+
 
 	print("Elapsed execution time: " + str(elapsedTime))
 	return finalRoverPath,finalRoverHeading,finalJoints,assignment
 
-finalRoverPath = np.zeros([0,3])
-finalRoverHeading = np.zeros([0,1])
-finalJoints = np.zeros([0,5])
-assignment = np.zeros([0,1])
 
 
 
