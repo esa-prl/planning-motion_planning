@@ -1846,7 +1846,7 @@ def main(xm,ym,xr,yr,initialHeading,mapDirectory,resolution,size):
 	plt.plot(tj,finalJoints[:,4],label='Fifth joint')
 	plt.show()
 	plt.legend()
-	assignment = np.int32(assignment)
+
 
 
     # Surf plot fetching configuration
@@ -1881,10 +1881,15 @@ def main(xm,ym,xr,yr,initialHeading,mapDirectory,resolution,size):
 	ax.set_aspect('equal')
 	plt.show()"""
 
+	
+	
+	
+	
+	assignment = np.int32(assignment)	
+	
 	elapsedTime = time()-startTime
-
-
 	print("Elapsed execution time: " + str(elapsedTime))
+	
 	return finalRoverPath,finalRoverHeading,finalJoints,assignment
 
 
