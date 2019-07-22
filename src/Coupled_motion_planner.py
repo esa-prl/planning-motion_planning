@@ -1078,730 +1078,730 @@ def smoothJoints(joints,times,qend):
     
 def main(xm,ym,xr,yr,initialHeading,mapDirectory,resolution,size):      
 		            
-	# =============================================================================
-	# =============================================================================
-	# =============================================================================
-	# =============================================================================
-	# =============================================================================
-	# =============================================================================
-	# # # # # # MAIN
-	# =============================================================================
-	# =============================================================================
-	# =============================================================================
-	# =============================================================================
-	# =============================================================================
-	# =============================================================================
-
-		    
-	startTime = time()
-
-	# =============================================================================
-	#     Loading map     
-	# =============================================================================
-
-	"""with open(str(mapDirectory)+'Xs.txt','r') as file:
-		Xs = array([[float(num) for num in line.split(',')] for line in file])
-	
-	with open(str(mapDirectory)+'Ys.txt','r') as file:
-		Ys = array([[float(num) for num in line.split(',')] for line in file])"""
-	
-	with open(str(mapDirectory)+'PRL_DEM.txt','r') as file:
-		Zs = array([[float(num) for num in line.split(',')] for line in file])
-	
-
-	#Xs = Xs-np.min(Xs)
-	#Ys = Ys-np.min(Ys)
-	Zs = Zs-np.min(Zs)
-
-
-	[Nx,Ny,Nz] = surface_normal(resolution,size,Zs)
-
-	# =============================================================================
-	#     Scene data
-	# =============================================================================
-
-	pxm = int(round(xm/resolution-1))
-	pym = int(round(ym/resolution-1))
-	zm = Zs[pym,pxm]
-	sampleNode = [pxm,pym]
-
-	# =============================================================================
-	#     Rover data
-	# =============================================================================
-	roverPos = [xr,yr]
-
-	qinitial = [math.pi/2,0,-2.21,0,0]
-	rxm = int(round(xr/resolution-1))
-	rym = int(round(yr/resolution-1))
-	roverNode = [rxm,rym]
-
-	# =============================================================================
-	#     Rover arm parameters
-	# =============================================================================
-	Rm = 0.4241     # Maximum optimal radius
-	rm = 0.1105     # Minimum optimal radius
-	rO = (Rm+rm)/2  # Optimal radius
-	Rlim = 0.527    # Maximum reachability radius
-	rlim = 0.05     # Minimum reachability radius
-
-	# =============================================================================
-	#     Rover configurable parameters
-	# =============================================================================
-	xa = 0.26       # X axes distance from rover reference system to arm base
-	ya = -0.15      # Y axes distance from rover reference system to arm base
-	za = 0.16       # Heigth from rover reference system to arm base
-	zp = 0.07       # Heigth from floor to rover reference system
-	zbase = 0.23    # Heigth from floor to arm base
-	diagonal = 0.9  # Diagonal length of the rover body
-	v = 0.1         # Rover speed
-	#zt = 0.39       # Heigth from floor to top of the rover
-
-
-
-
-
-	# =============================================================================
-	# =============================================================================
-	# =============================================================================
-	# # #     STEP 1
-	# =============================================================================
-	# =============================================================================
-	# =============================================================================
-
-	# =============================================================================
-	#     Surface parameters
-	# =============================================================================
+    # =============================================================================
+    # =============================================================================
+    # =============================================================================
+    # =============================================================================
+    # =============================================================================
+    # =============================================================================
+    # # # # # # MAIN
+    # =============================================================================
+    # =============================================================================
+    # =============================================================================
+    # =============================================================================
+    # =============================================================================
+    # =============================================================================
+
+                
+    startTime = time()
+
+    # =============================================================================
+    #     Loading map     
+    # =============================================================================
+
+    """with open(str(mapDirectory)+'Xs.txt','r') as file:
+        Xs = array([[float(num) for num in line.split(',')] for line in file])
+    
+    with open(str(mapDirectory)+'Ys.txt','r') as file:
+        Ys = array([[float(num) for num in line.split(',')] for line in file])"""
+    
+    with open(str(mapDirectory)+'PRL_DEM.txt','r') as file:
+        Zs = array([[float(num) for num in line.split(',')] for line in file])
+    
+
+    #Xs = Xs-np.min(Xs)
+    #Ys = Ys-np.min(Ys)
+    Zs = Zs-np.min(Zs)
+
+
+    [Nx,Ny,Nz] = surface_normal(resolution,size,Zs)
+
+    # =============================================================================
+    #     Scene data
+    # =============================================================================
+
+    pxm = int(round(xm/resolution-1))
+    pym = int(round(ym/resolution-1))
+    zm = Zs[pym,pxm]
+    sampleNode = [pxm,pym]
+
+    # =============================================================================
+    #     Rover data
+    # =============================================================================
+    roverPos = [xr,yr]
+
+    qinitial = [math.pi/2,0,-2.21,0,0]
+    rxm = int(round(xr/resolution-1))
+    rym = int(round(yr/resolution-1))
+    roverNode = [rxm,rym]
+
+    # =============================================================================
+    #     Rover arm parameters
+    # =============================================================================
+    Rm = 0.4241     # Maximum optimal radius
+    rm = 0.1105     # Minimum optimal radius
+    rO = (Rm+rm)/2  # Optimal radius
+    Rlim = 0.527    # Maximum reachability radius
+    rlim = 0.05     # Minimum reachability radius
+
+    # =============================================================================
+    #     Rover configurable parameters
+    # =============================================================================
+    xa = 0.26       # X axes distance from rover reference system to arm base
+    ya = -0.15      # Y axes distance from rover reference system to arm base
+    za = 0.16       # Heigth from rover reference system to arm base
+    zp = 0.07       # Heigth from floor to rover reference system
+    zbase = 0.23    # Heigth from floor to arm base
+    diagonal = 0.9  # Diagonal length of the rover body
+    v = 0.1         # Rover speed
+    #zt = 0.39       # Heigth from floor to top of the rover
+
+
+
+
+
+    # =============================================================================
+    # =============================================================================
+    # =============================================================================
+    # # #     STEP 1
+    # =============================================================================
+    # =============================================================================
+    # =============================================================================
+
+    # =============================================================================
+    #     Surface parameters
+    # =============================================================================
 
 
 
-	slope = np.arccos(Nz)
+    slope = np.arccos(Nz)
 
 
-	# =============================================================================
-	# =============================================================================
-	# #     Obstacle detection
-	# =============================================================================
-	# =============================================================================
+    # =============================================================================
+    # =============================================================================
+    # #     Obstacle detection
+    # =============================================================================
+    # =============================================================================
 
-	obstMap = np.zeros(Zs.shape)
-	# =============================================================================
-	# w = np.ones((m,n))
-	# for i in range(1,m-1):
-	#     for j in range(1,n-1):
-	#         w[i][j] = 1 - math.sqrt((Nx[i-1][j-1]+Nx[i-1][j]+Nx[i-1][j+1]+Nx[i][j-1]+Nx[i][j]+Nx[i][j+1]+Nx[i+1][j-1]+Nx[i+1][j]+Nx[i+1][j+1])**2+(Ny[i-1][j-1]+Ny[i-1][j]+Ny[i-1][j+1]+Ny[i][j-1]+Ny[i][j]+Ny[i][j+1]+Ny[i+1][j-1]+Ny[i+1][j]+Ny[i+1][j+1])**2+(Nz[i-1][j-1]+Nz[i-1][j]+Nz[i-1][j+1]+Nz[i][j-1]+Nz[i][j]+Nz[i][j+1]+Nz[i+1][j-1]+Nz[i+1][j]+Nz[i+1][j+1])**2)/9
-	#         if w[i][j] > 0.00105:
-	#             obstMap[i][j] = 1
-	# =============================================================================
+    obstMap = np.zeros(Zs.shape)
+    # =============================================================================
+    # w = np.ones((m,n))
+    # for i in range(1,m-1):
+    #     for j in range(1,n-1):
+    #         w[i][j] = 1 - math.sqrt((Nx[i-1][j-1]+Nx[i-1][j]+Nx[i-1][j+1]+Nx[i][j-1]+Nx[i][j]+Nx[i][j+1]+Nx[i+1][j-1]+Nx[i+1][j]+Nx[i+1][j+1])**2+(Ny[i-1][j-1]+Ny[i-1][j]+Ny[i-1][j+1]+Ny[i][j-1]+Ny[i][j]+Ny[i][j+1]+Ny[i+1][j-1]+Ny[i+1][j]+Ny[i+1][j+1])**2+(Nz[i-1][j-1]+Nz[i-1][j]+Nz[i-1][j+1]+Nz[i][j-1]+Nz[i][j]+Nz[i][j+1]+Nz[i+1][j-1]+Nz[i+1][j]+Nz[i+1][j+1])**2)/9
+    #         if w[i][j] > 0.00105:
+    #             obstMap[i][j] = 1
+    # =============================================================================
 
-	# =============================================================================
-	# 	Slope threshold
-	# =============================================================================
+    # =============================================================================
+    # 	Slope threshold
+    # =============================================================================
 
-	obstMap[slope>0.20] = 1  #0.419 for ETUMA
-	obstMap[0,:] = 0
-	obstMap[-1,:] = 0
-	obstMap[:,0] = 0
-	obstMap[:,-1] = 0
+    obstMap[slope>0.20] = 1  #0.419 for ETUMA
+    obstMap[0,:] = 0
+    obstMap[-1,:] = 0
+    obstMap[:,0] = 0
+    obstMap[:,-1] = 0
 
 
-	# =============================================================================
-	#     Filling gaps
-	# =============================================================================
+    # =============================================================================
+    #     Filling gaps
+    # =============================================================================
 
 
-	obstMap = np.uint8(obstMap)
-	obstMap = image_filling(obstMap)
+    obstMap = np.uint8(obstMap)
+    obstMap = image_filling(obstMap)
 
-	# =============================================================================
-	#     Eroding small obstacles
-	# =============================================================================
-	se = structural_disk(10)
-	obstMap = cv2.erode(obstMap,se,iterations = 1)
-	obstMap = cv2.dilate(obstMap,se,iterations = 1)
+    # =============================================================================
+    #     Eroding small obstacles
+    # =============================================================================
+    se = structural_disk(10)
+    obstMap = cv2.erode(obstMap,se,iterations = 1)
+    obstMap = cv2.dilate(obstMap,se,iterations = 1)
 
-	# =============================================================================
-	#     Eroding narrow corridors
-	# =============================================================================
-	obstDilatation = diagonal/2
-	se = structural_disk(int(round(obstDilatation/resolution)))
+    # =============================================================================
+    #     Eroding narrow corridors
+    # =============================================================================
+    obstDilatation = diagonal/2
+    se = structural_disk(int(round(obstDilatation/resolution)))
 
-	obstMap = cv2.dilate(obstMap,se,iterations = 1)
-	obstMap = image_filling(obstMap)
-	obstMap = cv2.erode(obstMap,se,iterations = 1)
+    obstMap = cv2.dilate(obstMap,se,iterations = 1)
+    obstMap = image_filling(obstMap)
+    obstMap = cv2.erode(obstMap,se,iterations = 1)
 
 
-	obstMap[0,:] = 1
-	obstMap[-1,:] = 1
-	obstMap[:,0] = 1
-	obstMap[:,-1] = 1
-	obstMap = np.float64(obstMap)
+    obstMap[0,:] = 1
+    obstMap[-1,:] = 1
+    obstMap[:,0] = 1
+    obstMap[:,-1] = 1
+    obstMap = np.float64(obstMap)
 
 
-	# =============================================================================
-	#     High cost map for obstacles
-	# =============================================================================
+    # =============================================================================
+    #     High cost map for obstacles
+    # =============================================================================
 
 
-	obstacleHighCost = obstMap*300
+    obstacleHighCost = obstMap*300
 
-	# =============================================================================
-	#     Dilated cost map based on distance to the nearest obstacles
-	# =============================================================================
-	obstExpansion = 1
-	se = structural_disk(int(round(obstExpansion/resolution)))
-	dilatedObstMap = cv2.dilate(obstMap,se,iterations = 1)
+    # =============================================================================
+    #     Dilated cost map based on distance to the nearest obstacles
+    # =============================================================================
+    obstExpansion = 1
+    se = structural_disk(int(round(obstExpansion/resolution)))
+    dilatedObstMap = cv2.dilate(obstMap,se,iterations = 1)
 
-	obstDistance = resolution*ndimage.distance_transform_edt(obstMap==0)
+    obstDistance = resolution*ndimage.distance_transform_edt(obstMap==0)
 
-	obstDist = dilatedObstMap*(1-obstDistance/(np.max(obstDistance)) )
-	minDist = np.min(obstDist[obstDist>0])
-	obstDist[obstDist>0] = obstDist[obstDist>0] - minDist
+    obstDist = dilatedObstMap*(1-obstDistance/(np.max(obstDistance)) )
+    minDist = np.min(obstDist[obstDist>0])
+    obstDist[obstDist>0] = obstDist[obstDist>0] - minDist
 
-	gradient = 10
+    gradient = 10
 
-	obstDilatedHighCost = obstDist*gradient
+    obstDilatedHighCost = obstDist*gradient
 
-	# =============================================================================
-	#     Final cost map
-	# =============================================================================
+    # =============================================================================
+    #     Final cost map
+    # =============================================================================
 
-	cMap = 1 + (obstacleHighCost+obstDilatedHighCost).T
+    cMap = 1 + (obstacleHighCost+obstDilatedHighCost).T
 
 
 
-	h = np.ones((50,50))/50**2
+    h = np.ones((50,50))/50**2
 
-	cMap = signal.convolve2d(cMap, np.flipud(h), mode='same',fillvalue=300)
+    cMap = signal.convolve2d(cMap, np.flipud(h), mode='same',fillvalue=300)
 
-	cMap[0,:] = np.inf
-	cMap[-1,:] = np.inf
-	cMap[:,0] = np.inf
-	cMap[:,-1] = np.inf
+    cMap[0,:] = np.inf
+    cMap[-1,:] = np.inf
+    cMap[:,0] = np.inf
+    cMap[:,-1] = np.inf
 
-	# =============================================================================
-	#     Fast marching method
-	# =============================================================================
+    # =============================================================================
+    #     Fast marching method
+    # =============================================================================
 
-	goal = sampleNode
-	start = roverNode
+    goal = sampleNode
+    start = roverNode
 
 
 
-	#Tmap = FM.computeTmap(cMap.T,goal,start)
-	TmapG,TmapS,nodeJoin = FM.biComputeTmap(cMap.T,goal,start)
+    #Tmap = FM.computeTmap(cMap.T,goal,start)
+    TmapG,TmapS,nodeJoin = FM.biComputeTmap(cMap.T,goal,start)
 
 
-	#path = FM.getPathGDM(Tmap,start,goal,0.5)
+    #path = FM.getPathGDM(Tmap,start,goal,0.5)
 
 
-	pathG = FM.getPathGDM(TmapG,nodeJoin,goal,0.5)
-	pathS = FM.getPathGDM(TmapS,nodeJoin,start,0.5)
+    pathG = FM.getPathGDM(TmapG,nodeJoin,goal,0.5)
+    pathS = FM.getPathGDM(TmapS,nodeJoin,start,0.5)
 
 
-	# =============================================================================
-	#     Obtaining the rover path
-	# =============================================================================
+    # =============================================================================
+    #     Obtaining the rover path
+    # =============================================================================
 
-	roverPath = np.vstack((np.flipud(pathS),pathG[1:,:]))
-	#roverPath[:,0] = signal.savgol_filter(roverPath[:,0], 11, 3)
-	#roverPath[:,1] = signal.savgol_filter(roverPath[:,1], 11, 3)
+    roverPath = np.vstack((np.flipud(pathS),pathG[1:,:]))
+    #roverPath[:,0] = signal.savgol_filter(roverPath[:,0], 11, 3)
+    #roverPath[:,1] = signal.savgol_filter(roverPath[:,1], 11, 3)
 
-	#roverPath = path
+    #roverPath = path
 
-	roverPath = dot(resolution,roverPath+1)
+    roverPath = dot(resolution,roverPath+1)
 
 
-	count = 0
-	i = 0
-	totalSize = len(roverPath)
-	while count < totalSize:
-		if np.linalg.norm(roverPath[i,:] - roverPos) < 0.1:
-			roverPath = np.delete(roverPath,i,axis=0)
-		elif np.linalg.norm(roverPath[i,:] - [xm,ym]) < 0.1:
-			roverPath = np.delete(roverPath,i,axis=0)
-		else:
-			i = i+1
-		count = count+1
+    count = 0
+    i = 0
+    totalSize = len(roverPath)
+    while count < totalSize:
+        if np.linalg.norm(roverPath[i,:] - roverPos) < 0.1:
+            roverPath = np.delete(roverPath,i,axis=0)
+        elif np.linalg.norm(roverPath[i,:] - [xm,ym]) < 0.1:
+            roverPath = np.delete(roverPath,i,axis=0)
+        else:
+            i = i+1
+        count = count+1
 
 
-	roverPath = np.vstack((roverPath.T,zp+Zs[np.uint32(np.round(roverPath[:,1]/resolution)),np.uint32(np.round(roverPath[:,0]/resolution))])).T
+    roverPath = np.vstack((roverPath.T,zp+Zs[np.uint32(np.round(roverPath[:,1]/resolution)),np.uint32(np.round(roverPath[:,0]/resolution))])).T
 
 
-	# =============================================================================
-	#     Obtaining rover heading
-	# =============================================================================
+    # =============================================================================
+    #     Obtaining rover heading
+    # =============================================================================
 
-	dX = np.diff(roverPath[:,0])
-	dY = np.diff(roverPath[:,1])
-	heading = np.hstack((initialHeading,np.arctan2(dY,dX))).T
+    dX = np.diff(roverPath[:,0])
+    dY = np.diff(roverPath[:,1])
+    heading = np.hstack((initialHeading,np.arctan2(dY,dX))).T
 
 
-	# =============================================================================
-	#     Obtaining arm base path and heading
-	# =============================================================================
-	realBasePath = np.zeros(roverPath.shape)
+    # =============================================================================
+    #     Obtaining arm base path and heading
+    # =============================================================================
+    realBasePath = np.zeros(roverPath.shape)
 
-	for i in range(0,len(roverPath)):
-		realBasePath[i,:] = posTransform(roverPath[i,:],[0,0,heading[i]],[xa,ya,za])
+    for i in range(0,len(roverPath)):
+        realBasePath[i,:] = posTransform(roverPath[i,:],[0,0,heading[i]],[xa,ya,za])
 
 
-	realBaseHeading = roverHeading(realBasePath,heading,resolution,Zs)
+    realBaseHeading = roverHeading(realBasePath,heading,resolution,Zs)
 
-	"""# Contour plot time map
-	fig, ax = plt.subplots()
-	TmapG[np.isinf(TmapG)] = 0
-	TmapS[np.isinf(TmapS)] = 0
-	ax.contourf(Xs, Ys, TmapG+TmapS, cmap = 'RdBu')
-	#ax.contourf(Xs, Ys, Tmap, cmap = 'RdBu')
-	ax.set_aspect('equal')
-	plt.show()
+    """# Contour plot time map
+    fig, ax = plt.subplots()
+    TmapG[np.isinf(TmapG)] = 0
+    TmapS[np.isinf(TmapS)] = 0
+    ax.contourf(Xs, Ys, TmapG+TmapS, cmap = 'RdBu')
+    #ax.contourf(Xs, Ys, Tmap, cmap = 'RdBu')
+    ax.set_aspect('equal')
+    plt.show()
 
 
-	# Contour plot obstacles distance
-	fig, ax = plt.subplots()
-	csd = ax.contourf(Xs,Ys,obstDistance)
-	ax.set_aspect('equal')
-	fig.colorbar(csd, ax=ax, shrink=0.9)
-	plt.show()
+    # Contour plot obstacles distance
+    fig, ax = plt.subplots()
+    csd = ax.contourf(Xs,Ys,obstDistance)
+    ax.set_aspect('equal')
+    fig.colorbar(csd, ax=ax, shrink=0.9)
+    plt.show()
 
-	# Surf plot obstacles
-	Zsm = Zs
-	Zsm[Zs<7.25]=8
-	m,n = Xs.shape
-	colors = np.empty(Xsm.shape,dtype=str)
-	for y in range(0,n):
-		for x in range(0,m):
-		    if obstMap[x,y] == 1:
-		        colors[x, y] = 'y'
-		    else:
-		        colors[x, y] = 'b'
-	fig = plt.figure()
-	ax = fig.gca(projection='3d')
-	ax.plot_surface(Xs, Ys, Zsm,rstride=2, cstride=2, cmap = 'RdBu')
-	ax.set_aspect('equal')
-	ax.set_zlim([7.25,8.25])
-	plt.show()"""
+    # Surf plot obstacles
+    Zsm = Zs
+    Zsm[Zs<7.25]=8
+    m,n = Xs.shape
+    colors = np.empty(Xsm.shape,dtype=str)
+    for y in range(0,n):
+            for x in range(0,m):
+                if obstMap[x,y] == 1:
+                    colors[x, y] = 'y'
+                else:
+                    colors[x, y] = 'b'
+    fig = plt.figure()
+    ax = fig.gca(projection='3d')
+    ax.plot_surface(Xs, Ys, Zsm,rstride=2, cstride=2, cmap = 'RdBu')
+    ax.set_aspect('equal')
+    ax.set_zlim([7.25,8.25])
+    plt.show()"""
 
 
 
-	# =============================================================================
-	# =============================================================================
-	# =============================================================================
-	# # #     STEP 2
-	# =============================================================================
-	# =============================================================================
-	# =============================================================================
+    # =============================================================================
+    # =============================================================================
+    # =============================================================================
+    # # #     STEP 2
+    # =============================================================================
+    # =============================================================================
+    # =============================================================================
 
-	# =============================================================================
-	#     Extracting waypoints inside sampling area
-	# =============================================================================
+    # =============================================================================
+    #     Extracting waypoints inside sampling area
+    # =============================================================================
 
-	subPath = np.zeros([0,3])
-	subPathHeading = np.zeros([0,3])
+    subPath = np.zeros([0,3])
+    subPathHeading = np.zeros([0,3])
 
-	for i in range(0,len(realBasePath)):
-		if np.linalg.norm(realBasePath[i,:] - [xm,ym,zm]) < Rlim:
-			subPath = np.vstack((subPath,realBasePath[i,:]))
-			subPathHeading = np.vstack((subPathHeading,realBaseHeading[i,:]))
+    for i in range(0,len(realBasePath)):
+        if np.linalg.norm(realBasePath[i,:] - [xm,ym,zm]) < Rlim:
+            subPath = np.vstack((subPath,realBasePath[i,:]))
+            subPathHeading = np.vstack((subPathHeading,realBaseHeading[i,:]))
 
 
-	# =============================================================================
-	#     Cost in function of the reachability
-	# =============================================================================
-	distCost = np.zeros(len(subPath))
-	for i in range(0,len(subPath)):
-		d = np.linalg.norm(subPath[i,:]-[xm,ym,zm])
-		baseOrientation = np.arctan2((ym-subPath[i,1])/d,(xm-subPath[i,0])/d)
-		if baseOrientation-subPathHeading[i,2] < math.pi/2 and baseOrientation-subPathHeading[i,2] > 0:
-			if d < rlim:
-				distCost[i] = np.inf
-			elif d > Rlim:
-				distCost[i] = np.inf
-			else:
-				distCost[i] = 1/((rO+Rm)/2)**2*(d-((rO+Rm)/2))**2
-		else:
-			distCost[i] = np.inf
+    # =============================================================================
+    #     Cost in function of the reachability
+    # =============================================================================
+    distCost = np.zeros(len(subPath))
+    for i in range(0,len(subPath)):
+        d = np.linalg.norm(subPath[i,:]-[xm,ym,zm])
+        baseOrientation = np.arctan2((ym-subPath[i,1])/d,(xm-subPath[i,0])/d)
+        if baseOrientation-subPathHeading[i,2] < math.pi/2 and baseOrientation-subPathHeading[i,2] > 0:
+            if d < rlim:
+                distCost[i] = np.inf
+            elif d > Rlim:
+                distCost[i] = np.inf
+            else:
+                distCost[i] = 1/((rO+Rm)/2)**2*(d-((rO+Rm)/2))**2
+        else:
+            distCost[i] = np.inf
 
-	distCost[distCost!=np.inf] = distCost[distCost!=np.inf]/np.max(distCost[distCost!=np.inf])
+    distCost[distCost!=np.inf] = distCost[distCost!=np.inf]/np.max(distCost[distCost!=np.inf])
 
-	# =============================================================================
-	#     Cost in function of the position of the wheels
-	# =============================================================================
-	inclCost = np.zeros(len(subPath))
-	for i in range(0,len(subPath)):
-		w1,w2,w3,w4,w5,w6 = basePos2wheelsPos(subPath[i,:],subPathHeading[i,:],Zs,resolution)
+    # =============================================================================
+    #     Cost in function of the position of the wheels
+    # =============================================================================
+    inclCost = np.zeros(len(subPath))
+    for i in range(0,len(subPath)):
+        w1,w2,w3,w4,w5,w6 = basePos2wheelsPos(subPath[i,:],subPathHeading[i,:],Zs,resolution)
 
-		w1Cost = obstMap[int(round(w1[1]/resolution)),int(round(w1[0]/resolution))]
-		w2Cost = obstMap[int(round(w2[1]/resolution)),int(round(w2[0]/resolution))]
-		w3Cost = obstMap[int(round(w3[1]/resolution)),int(round(w3[0]/resolution))]
-		w4Cost = obstMap[int(round(w4[1]/resolution)),int(round(w4[0]/resolution))]
-		w5Cost = obstMap[int(round(w5[1]/resolution)),int(round(w5[0]/resolution))]
-		w6Cost = obstMap[int(round(w6[1]/resolution)),int(round(w6[0]/resolution))]
+        w1Cost = obstMap[int(round(w1[1]/resolution)),int(round(w1[0]/resolution))]
+        w2Cost = obstMap[int(round(w2[1]/resolution)),int(round(w2[0]/resolution))]
+        w3Cost = obstMap[int(round(w3[1]/resolution)),int(round(w3[0]/resolution))]
+        w4Cost = obstMap[int(round(w4[1]/resolution)),int(round(w4[0]/resolution))]
+        w5Cost = obstMap[int(round(w5[1]/resolution)),int(round(w5[0]/resolution))]
+        w6Cost = obstMap[int(round(w6[1]/resolution)),int(round(w6[0]/resolution))]
 
-		inclCost[i] = w1Cost+w2Cost+w3Cost+w4Cost+w5Cost+w6Cost
-		if inclCost[i]>0:
-			inclCost[i] = np.inf
+        inclCost[i] = w1Cost+w2Cost+w3Cost+w4Cost+w5Cost+w6Cost
+        if inclCost[i]>0:
+            inclCost[i] = np.inf
 
 
-	# =============================================================================
-	#     Cost in function of the distance to obstacles
-	# =============================================================================
-	obstCost = np.zeros(len(subPath))
+    # =============================================================================
+    #     Cost in function of the distance to obstacles
+    # =============================================================================
+    obstCost = np.zeros(len(subPath))
 
-	for i in range(0,len(subPath)):
-		obstCost[i] = obstDistance[int(round(subPath[i,1]/resolution)),int(round(subPath[i,0]/resolution))]
+    for i in range(0,len(subPath)):
+        obstCost[i] = obstDistance[int(round(subPath[i,1]/resolution)),int(round(subPath[i,0]/resolution))]
 
-	if np.max(obstCost)==0:
-		obstCost = np.inf+obstCost
-	else:
-		obstCost = 1-obstCost/np.max(obstCost)
-		for i in range(0,len(subPath)):
-			if obstCost[i]>= 0.99:
-				obstCost[i] = np.inf
+    if np.max(obstCost)==0:
+        obstCost = np.inf+obstCost
+    else:
+        obstCost = 1-obstCost/np.max(obstCost)
+        for i in range(0,len(subPath)):
+            if obstCost[i]>= 0.99:
+                obstCost[i] = np.inf
 
 
-	# =============================================================================
-	#     Cost in function of the heading
-	# =============================================================================
-	headingCost = np.zeros(len(subPath))
-	for i in range(0,len(subPath)):
-		roverCenterPos = roverPath[-len(subPath)+i,:]
-		roverCenterHeading = heading[-len(subPath)+i]
-		d = np.linalg.norm([roverCenterPos[0],roverCenterPos[1]]-array([xm,ym]))
-		bestOrientation = np.arctan2((ym-roverCenterPos[1])/d,(xm-roverCenterPos[0])/d)
+    # =============================================================================
+    #     Cost in function of the heading
+    # =============================================================================
+    headingCost = np.zeros(len(subPath))
+    for i in range(0,len(subPath)):
+        roverCenterPos = roverPath[-len(subPath)+i,:]
+        roverCenterHeading = heading[-len(subPath)+i]
+        d = np.linalg.norm([roverCenterPos[0],roverCenterPos[1]]-array([xm,ym]))
+        bestOrientation = np.arctan2((ym-roverCenterPos[1])/d,(xm-roverCenterPos[0])/d)
 
-		headingCost[i] = np.abs(roverCenterHeading-bestOrientation)
+        headingCost[i] = np.abs(roverCenterHeading-bestOrientation)
 
 
-	headingCost = headingCost/np.max(headingCost)
+    headingCost = headingCost/np.max(headingCost)
 
-	# =============================================================================
-	#     Total Cost
-	# =============================================================================
-	totalCost = distCost+inclCost+obstCost+headingCost
+    # =============================================================================
+    #     Total Cost
+    # =============================================================================
+    totalCost = distCost+inclCost+obstCost+headingCost
 
 
-	# =============================================================================
-	#     Best position
-	# ============================================================================
-	minCost = min(totalCost)
-	index = np.int32(np.where(totalCost==minCost))
+    # =============================================================================
+    #     Best position
+    # ============================================================================
+    minCost = min(totalCost)
+    index = np.int32(np.where(totalCost==minCost))
 
-	if np.isinf(minCost):
-		index = np.inf
-		print('ERROR: The sample is not reachable')
-		return 0
-
-	# =============================================================================
-	#     else:
-	#         baseStopPosition = subPath[index,:]
-	#         roverStopPosition = roverPath[-1-len(subPath)-index,:]
-	# =============================================================================
-
-	# =============================================================================
-	#     Final paths
-	# =============================================================================
-
-	finalIndex = len(realBasePath)-len(subPath)+index[0,0]
-
-	finalBasePath = realBasePath[range(0,finalIndex+1),:]
-	finalBaseHeading = realBaseHeading[range(0,finalIndex+1),:]
-
-	global finalRoverPath
-	finalRoverPath = roverPath[range(0,finalIndex+1),:]
-	global finalRoverHeading
-	finalRoverHeading = heading[range(0,finalIndex+1)]
-
-
-	# =============================================================================
-	#     Final elbow position (up/down)
-	# =============================================================================
-	zm = zm+0.10
-
-	if zm>finalBasePath[-1,2]-zbase:
-		ryf = np.arctan2(Nz[sampleNode[1],sampleNode[0]],np.linalg.norm([Nx[sampleNode[1],sampleNode[0]],Ny[sampleNode[1],sampleNode[0]]]))
-	else:
-		ryf = (math.pi-np.arctan2(Nz[sampleNode[1],sampleNode[0]],np.linalg.norm([Nx[sampleNode[1],sampleNode[0]],Ny[sampleNode[1],sampleNode[0]]])))%math.pi
-
-
-	d = np.linalg.norm([finalBasePath[-1,0],finalBasePath[-1,1]]-array([xm,ym]))
-	zproy = finalBasePath[-1,2] - d*np.tan(finalBaseHeading[-1,1])
-
-	if zproy > zm:
-		elbow = 1
-		qid = [-math.pi/2,-1.6422,1.459,2.796,0]  # Initial configuration after deployment
-	else:
-		elbow = 0
-		qid = [-math.pi/2,-0.6721,-0.5,-0.3456,0]  # Initial configuration after deployment
-		ryf = -ryf%(2*math.pi)
-
-
-	# =============================================================================
-	#     Final arm configuration
-	# =============================================================================
-	baseSampleDistance = distTransform(finalBasePath[-1,:],[finalBaseHeading[-1,0],finalBaseHeading[-1,1]+math.pi/2,finalBaseHeading[-1,2]],[xm,ym,zm])
-	baseSampleOrientation = [np.arctan2(baseSampleDistance[1],baseSampleDistance[0]),ryf,0]
-
-
-	qend = MCI(baseSampleDistance,baseSampleOrientation,elbow)
-	if np.isnan(qend[0]):
-		print('ERROR: The final configuration will lead into collision. The sample is not reachable')
-		return 0
-
-	"""# Contour plot obst map
-	fig, ax = plt.subplots()
-	cs = ax.contourf(Xs, Ys, obstMap)
-	plt.plot(finalRoverPath[:,0],finalRoverPath[:,1])
-	plt.plot(finalBasePath[:,0],finalBasePath[:,1])
-	plt.scatter(xm,ym,color='red',marker='x')
-	plt.scatter(xr,yr,color='green')
-	ax.set_aspect('equal')
-	fig.colorbar(cs, ax=ax, shrink=0.9)
-	plt.show()
-
-	# Contour plot cost map
-	fig, ax = plt.subplots()
-	cs = ax.contourf(Xs, Ys, cMap.T,80)
-	plt.plot(finalRoverPath[:,0],finalRoverPath[:,1])
-	plt.plot(finalBasePath[:,0],finalBasePath[:,1])
-	plt.scatter(xm,ym,color='red',marker='x')
-	plt.scatter(xr,yr,color='green')
-	ax.set_aspect('equal')
-	fig.colorbar(cs, ax=ax, shrink=0.9)
-	plt.show()"""
-
-	# =============================================================================
-	# STEP 3
-	# =============================================================================
-	# =============================================================================
-	#  Effector Planning
-	#  Path Planning of the end-effector
-	#  This script is in charge of getting the path of the end-effector from the
-	#  initial configuration to the sampling position
-	# =============================================================================
-	# =============================================================================
-	# Select end-effector path planning start point
-	# The end-effector planning will start when there is only 1 metres left to
-	# reach de sampling area
-	# =============================================================================
-
-	for i in range(len(finalRoverPath)-1,-1,-1):
-		aux = [finalBasePath[i,0] - xm, finalBasePath[i,1] - ym, finalBasePath[i,2] - zm]
-		if np.linalg.norm(aux) >= 1:
-			index = i
-			break
-
-	# =============================================================================
-	# Deployment stage
-	# =============================================================================
-	joints = deploymentStage(qid,qend,index,qinitial)
-	# =============================================================================
-	# End-effector's path planning area
-	# =============================================================================
-	# Arm's base path and heading inside the end-effector planning area
-	effectorBasePath = array(finalBasePath[range(index,len(finalBasePath)),:])
-	effectorBaseHeading = array(finalBaseHeading[range(index,len(finalBaseHeading)),:])
-
-	# Maximum and minimum positions of the arm's base path inside the area
-	xmin = np.min(effectorBasePath[:,0])-1.4*Rlim
-	xmax = np.max(effectorBasePath[:,0])+1.4*Rlim
-	ymin = np.min(effectorBasePath[:,1])-1.4*Rlim
-	ymax = np.max(effectorBasePath[:,1])+1.4*Rlim
-
-	# Center of the area
-	xi = (xmin+xmax)/2
-	yi = (ymin+ymax)/2
-	pxi = int(round(xi/resolution))
-	pyi = int(round(yi/resolution))
-
-	# The size of the area is obtained in funtion of the arm's base path
-	dx = xmax-xmin
-	dy = ymax-ymin
-	if dx >= dy:
-		halfMap = dx/2
-	else:
-		halfMap = dy/2
-
-	indHalf = int(round(halfMap/resolution))
-	# Indices of the maximum and minimum positions inside the map
-	ixmin = pxi-indHalf
-	ixmax = pxi+indHalf
-	iymin = pyi-indHalf
-	iymax = pyi+indHalf
-
-	# Ensuring there is no point outside the real map
-	maxind = int(round(size/resolution))
-	if ixmin <= 0:
-		ixmin = 1
-	elif ixmin > maxind:
-		ixmin = maxind
-	if ixmax <= 0:
-		ixmax = 1
-	elif ixmax > maxind:
-		ixmax = maxind
-	if iymin <= 0:
-		iymin = 1
-	elif iymin > maxind:
-		iymin = maxind
-	if iymax <= 0:
-		iymax = 1
-	elif iymax > maxind:
-		iymax = maxind
-
-
-	# New reduced size map that defines the end-effector's path planning area
-	ZsMap = np.zeros([iymax-iymin,ixmax-ixmin])
-	for j in range(iymin,iymax):
-		for i in range(ixmin,ixmax):
-			ZsMap[j-iymin,i-ixmin] = Zs[j,i]
-
-
-	# =============================================================================
-	# New map parameters for the end-effector path planner
-	# =============================================================================
-	# Map real size
-	aX = resolution*(ixmax-1)-resolution*ixmin
-	aY = resolution*(iymax-1)-resolution*iymin
-	aZ = np.max(ZsMap)-np.min(ZsMap)+0.5
-
-	# Number of nodes for each axis
-	sX, sY = ZsMap.shape
-	sZ = int(round(aZ/0.02))
-
-	# Resolution for each axis
-	resX= aX/sX
-	resY= aY/sY
-	resZ= 0.02
-
-	# Putting map reference frame into [0,0,0]
-	Xmin = resolution*ixmin
-	Ymin = resolution*iymin
-	Zmin = np.min(ZsMap)
-
-	ZsMap = ZsMap-Zmin
-
-	# Putting arm's base path into the new reference frame
-	effectorBasePath[:,0] = effectorBasePath[:,0]-Xmin
-	effectorBasePath[:,1] = effectorBasePath[:,1]-Ymin
-	effectorBasePath[:,2] = effectorBasePath[:,2]-Zmin
-
-	# Putting sample position into the new reference frame
-	xmNew = xm - Xmin
-	ymNew = ym - Ymin
-	zmNew = zm - Zmin
-
-	# =============================================================================
-	# Create obstacles cost map
-	# =============================================================================
-
-	# Taking the obstacle map inside the new map
-	newObstMap = np.zeros([iymax-iymin,ixmax-ixmin])
-	for i in range(ixmin,ixmax):
-		newObstMap[:,i-ixmin] = obstMap[range(iymin,iymax),i]
-
-
-	# Obtaining obstacles, ground and total terrain cost map
-	Cmap1,obstMap3,groundMap = GetObstMap(ZsMap,resX,resY,resZ,sX,sY,sZ,newObstMap,xm,ym)
-
-	# =============================================================================
-	# Set inicial point and final point
-	# =============================================================================
-	# Vector with the position and orientation from the arm's base to the
-	# end-effector's initial position
-	qi = joints[-1,:]
-
-	# Transformation from the arm's base to the end-effector's initial position
-	Tbp = MCD(qi)
-	Rini = trans2pos(Tbp,elbow)
-
-	# Orientation of the arm's base
-	alpha = effectorBaseHeading[0,2] # Rz
-	beta = math.pi/2+effectorBaseHeading[0,1] # Ry
-	gamma = effectorBaseHeading[0,0] # Rx
-
-	ca = math.cos(alpha)
-	cb = math.cos(beta)
-	cg = math.cos(gamma)
-	sa = math.sin(alpha)
-	sb = math.sin(beta)
-	sg = math.sin(gamma)
-
-	# Transformation from the origin to the arm's base
-	Tob = [[ca*cb, ca*sb*sg-sa*cg, ca*sb*cg+sa*sg, effectorBasePath[0,0]],
-		   [sa*cb, sa*sb*sg+ca*cg, sa*sb*cg-ca*sg, effectorBasePath[0,1]],
-		   [-sb, cb*sg, cb*cg, effectorBasePath[0,2]],
-		   [0, 0, 0, 1]]
-
-
-	# Transformation from the origin to the end-effector's initial position
-	Top = dot(Tob,Tbp)
-
-	# Initial position of the end-effector
-	xini = Top[0,3]
-	yini = Top[1,3]
-	zini = Top[2,3]
-
-	# Nodes with the initial and final end-effector's positions
-	#initialWayPointArm = [int(np.round(xini/resX)) , int(np.round(yini/resY)), int(np.round(zini/resZ))]
-	initialWayPointArm = np.uint32(np.round([xini/resX , yini/resY, zini/resZ]))
-	#finalWayPointArm = [int(np.round(xmNew/resX)) , int(np.round(ymNew/resY)), int(np.round(zmNew/resZ))]
-	finalWayPointArm = np.uint32(np.round([xmNew/resX , ymNew/resY , zmNew/resZ]))
-
-	# =============================================================================
-	# Generate tunnel extruding a circle
-	# =============================================================================
-	Cmap2 = TunnelCost(Rlim,rO,rm,effectorBasePath,sX,sY,sZ,resX,resY,resZ,effectorBaseHeading,finalWayPointArm,initialWayPointArm)
-
-	# Total cost map is the sum of ground, obstacles and tunnel
-	Cmap = Cmap1 * Cmap2
-
-
-
-	# =============================================================================
-	# Fast Marching 3D
-	# =============================================================================
-
-	Tmap3D = FM3D.computeTmap(Cmap,finalWayPointArm,initialWayPointArm)
-	#TmapG,TmapS,nodeJoin = FM3D.biComputeTmap(Cmap,finalWayPointArm,initialWayPointArm)
-
-
-	gamma3D = array(FM3D.getPathGDM(Tmap3D,initialWayPointArm,finalWayPointArm,0.5))
-	#pathG = FM.getPathGDM(TmapG,nodeJoin,finalWayPointArm,0.5)
-	#pathS = FM.getPathGDM(TmapS,nodeJoin,initialWayPointArm,0.5)
-
-	#gamma3D = np.vstack((np.flipud(pathS),pathG))
-
-	gamma3D[:,0] = gamma3D[:,0]*resX
-	gamma3D[:,1] = gamma3D[:,1]*resY
-	gamma3D[:,2] = gamma3D[:,2]*resZ
-
-	gamma3D[:,0] = signal.savgol_filter(gamma3D[:,0], 15, 3)
-	gamma3D[:,1] = signal.savgol_filter(gamma3D[:,1], 15, 3)
-	gamma3D[:,2] = signal.savgol_filter(gamma3D[:,2], 15, 3)
-
-	#gamma3D[:,0] = ndimage.gaussian_filter1d(gamma3D[:,0], 10)
-	#gamma3D[:,1] = ndimage.gaussian_filter1d(gamma3D[:,1], 10)
-	#gamma3D[:,2] = ndimage.gaussian_filter1d(gamma3D[:,2], 10)
-
-
-	effectorBasePath[:,0] = effectorBasePath[:,0]+Xmin
-	effectorBasePath[:,1] = effectorBasePath[:,1]+Ymin
-	effectorBasePath[:,2] = effectorBasePath[:,2]+Zmin
-
-	gamma3D[:,0] = gamma3D[:,0]+Xmin
-	gamma3D[:,1] = gamma3D[:,1]+Ymin
-	gamma3D[:,2] = gamma3D[:,2]+Zmin
-
-	gamma3D[-1,:] = [xm,ym,zm]
-
-	resizedGamma3D = np.zeros([len(finalBasePath)-index+1,3])
-
-	fx = interpolate.interp1d(range(0,len(gamma3D)),gamma3D[:,0])
-	fy = interpolate.interp1d(range(0,len(gamma3D)),gamma3D[:,1])
-	fz = interpolate.interp1d(range(0,len(gamma3D)),gamma3D[:,2])
-	resizedGamma3D[:,0] = fx(np.linspace(0,len(gamma3D)-1,len(finalBasePath)-index+1,endpoint=True))
-	resizedGamma3D[:,1] = fy(np.linspace(0,len(gamma3D)-1,len(finalBasePath)-index+1,endpoint=True))
-	resizedGamma3D[:,2] = fz(np.linspace(0,len(gamma3D)-1,len(finalBasePath)-index+1,endpoint=True))
+    if np.isinf(minCost):
+        index = np.inf
+        print('ERROR: The sample is not reachable')
+        return 0
+
+    # =============================================================================
+    #     else:
+    #         baseStopPosition = subPath[index,:]
+    #         roverStopPosition = roverPath[-1-len(subPath)-index,:]
+    # =============================================================================
+
+    # =============================================================================
+    #     Final paths
+    # =============================================================================
+
+    finalIndex = len(realBasePath)-len(subPath)+index[0,0]
+
+    finalBasePath = realBasePath[range(0,finalIndex+1),:]
+    finalBaseHeading = realBaseHeading[range(0,finalIndex+1),:]
+
+    global finalRoverPath
+    finalRoverPath = roverPath[range(0,finalIndex+1),:]
+    global finalRoverHeading
+    finalRoverHeading = heading[range(0,finalIndex+1)]
+
+
+    # =============================================================================
+    #     Final elbow position (up/down)
+    # =============================================================================
+    zm = zm+0.10
+
+    if zm>finalBasePath[-1,2]-zbase:
+        ryf = np.arctan2(Nz[sampleNode[1],sampleNode[0]],np.linalg.norm([Nx[sampleNode[1],sampleNode[0]],Ny[sampleNode[1],sampleNode[0]]]))
+    else:
+        ryf = (math.pi-np.arctan2(Nz[sampleNode[1],sampleNode[0]],np.linalg.norm([Nx[sampleNode[1],sampleNode[0]],Ny[sampleNode[1],sampleNode[0]]])))%math.pi
+
+
+    d = np.linalg.norm([finalBasePath[-1,0],finalBasePath[-1,1]]-array([xm,ym]))
+    zproy = finalBasePath[-1,2] - d*np.tan(finalBaseHeading[-1,1])
+
+    if zproy > zm:
+        elbow = 1
+        qid = [-math.pi/2,-1.6422,1.459,2.796,0]  # Initial configuration after deployment
+    else:
+        elbow = 0
+        qid = [-math.pi/2,-0.6721,-0.5,-0.3456,0]  # Initial configuration after deployment
+        ryf = -ryf%(2*math.pi)
+
+
+    # =============================================================================
+    #     Final arm configuration
+    # =============================================================================
+    baseSampleDistance = distTransform(finalBasePath[-1,:],[finalBaseHeading[-1,0],finalBaseHeading[-1,1]+math.pi/2,finalBaseHeading[-1,2]],[xm,ym,zm])
+    baseSampleOrientation = [np.arctan2(baseSampleDistance[1],baseSampleDistance[0]),ryf,0]
+
+
+    qend = MCI(baseSampleDistance,baseSampleOrientation,elbow)
+    if np.isnan(qend[0]):
+        print('ERROR: The final configuration will lead into collision. The sample is not reachable')
+        return 0
+
+    """# Contour plot obst map
+    fig, ax = plt.subplots()
+    cs = ax.contourf(Xs, Ys, obstMap)
+    plt.plot(finalRoverPath[:,0],finalRoverPath[:,1])
+    plt.plot(finalBasePath[:,0],finalBasePath[:,1])
+    plt.scatter(xm,ym,color='red',marker='x')
+    plt.scatter(xr,yr,color='green')
+    ax.set_aspect('equal')
+    fig.colorbar(cs, ax=ax, shrink=0.9)
+    plt.show()
+
+    # Contour plot cost map
+    fig, ax = plt.subplots()
+    cs = ax.contourf(Xs, Ys, cMap.T,80)
+    plt.plot(finalRoverPath[:,0],finalRoverPath[:,1])
+    plt.plot(finalBasePath[:,0],finalBasePath[:,1])
+    plt.scatter(xm,ym,color='red',marker='x')
+    plt.scatter(xr,yr,color='green')
+    ax.set_aspect('equal')
+    fig.colorbar(cs, ax=ax, shrink=0.9)
+    plt.show()"""
+
+    # =============================================================================
+    # STEP 3
+    # =============================================================================
+    # =============================================================================
+    #  Effector Planning
+    #  Path Planning of the end-effector
+    #  This script is in charge of getting the path of the end-effector from the
+    #  initial configuration to the sampling position
+    # =============================================================================
+    # =============================================================================
+    # Select end-effector path planning start point
+    # The end-effector planning will start when there is only 1 metres left to
+    # reach de sampling area
+    # =============================================================================
+
+    for i in range(len(finalRoverPath)-1,-1,-1):
+        aux = [finalBasePath[i,0] - xm, finalBasePath[i,1] - ym, finalBasePath[i,2] - zm]
+        if np.linalg.norm(aux) >= 1:
+            index = i
+            break
+
+    # =============================================================================
+    # Deployment stage
+    # =============================================================================
+    joints = deploymentStage(qid,qend,index,qinitial)
+    # =============================================================================
+    # End-effector's path planning area
+    # =============================================================================
+    # Arm's base path and heading inside the end-effector planning area
+    effectorBasePath = array(finalBasePath[range(index,len(finalBasePath)),:])
+    effectorBaseHeading = array(finalBaseHeading[range(index,len(finalBaseHeading)),:])
+
+    # Maximum and minimum positions of the arm's base path inside the area
+    xmin = np.min(effectorBasePath[:,0])-1.4*Rlim
+    xmax = np.max(effectorBasePath[:,0])+1.4*Rlim
+    ymin = np.min(effectorBasePath[:,1])-1.4*Rlim
+    ymax = np.max(effectorBasePath[:,1])+1.4*Rlim
+
+    # Center of the area
+    xi = (xmin+xmax)/2
+    yi = (ymin+ymax)/2
+    pxi = int(round(xi/resolution))
+    pyi = int(round(yi/resolution))
+
+    # The size of the area is obtained in funtion of the arm's base path
+    dx = xmax-xmin
+    dy = ymax-ymin
+    if dx >= dy:
+        halfMap = dx/2
+    else:
+        halfMap = dy/2
+
+    indHalf = int(round(halfMap/resolution))
+    # Indices of the maximum and minimum positions inside the map
+    ixmin = pxi-indHalf
+    ixmax = pxi+indHalf
+    iymin = pyi-indHalf
+    iymax = pyi+indHalf
+
+    # Ensuring there is no point outside the real map
+    maxind = int(round(size/resolution))
+    if ixmin <= 0:
+        ixmin = 1
+    elif ixmin > maxind:
+        ixmin = maxind
+    if ixmax <= 0:
+        ixmax = 1
+    elif ixmax > maxind:
+        ixmax = maxind
+    if iymin <= 0:
+        iymin = 1
+    elif iymin > maxind:
+        iymin = maxind
+    if iymax <= 0:
+        iymax = 1
+    elif iymax > maxind:
+        iymax = maxind
+
+
+    # New reduced size map that defines the end-effector's path planning area
+    ZsMap = np.zeros([iymax-iymin,ixmax-ixmin])
+    for j in range(iymin,iymax):
+        for i in range(ixmin,ixmax):
+            ZsMap[j-iymin,i-ixmin] = Zs[j,i]
+
+
+    # =============================================================================
+    # New map parameters for the end-effector path planner
+    # =============================================================================
+    # Map real size
+    aX = resolution*(ixmax-1)-resolution*ixmin
+    aY = resolution*(iymax-1)-resolution*iymin
+    aZ = np.max(ZsMap)-np.min(ZsMap)+0.5
+
+    # Number of nodes for each axis
+    sX, sY = ZsMap.shape
+    sZ = int(round(aZ/0.02))
+
+    # Resolution for each axis
+    resX= aX/sX
+    resY= aY/sY
+    resZ= 0.02
+
+    # Putting map reference frame into [0,0,0]
+    Xmin = resolution*ixmin
+    Ymin = resolution*iymin
+    Zmin = np.min(ZsMap)
+
+    ZsMap = ZsMap-Zmin
+
+    # Putting arm's base path into the new reference frame
+    effectorBasePath[:,0] = effectorBasePath[:,0]-Xmin
+    effectorBasePath[:,1] = effectorBasePath[:,1]-Ymin
+    effectorBasePath[:,2] = effectorBasePath[:,2]-Zmin
+
+    # Putting sample position into the new reference frame
+    xmNew = xm - Xmin
+    ymNew = ym - Ymin
+    zmNew = zm - Zmin
+
+    # =============================================================================
+    # Create obstacles cost map
+    # =============================================================================
+
+    # Taking the obstacle map inside the new map
+    newObstMap = np.zeros([iymax-iymin,ixmax-ixmin])
+    for i in range(ixmin,ixmax):
+        newObstMap[:,i-ixmin] = obstMap[range(iymin,iymax),i]
+
+
+    # Obtaining obstacles, ground and total terrain cost map
+    Cmap1,obstMap3,groundMap = GetObstMap(ZsMap,resX,resY,resZ,sX,sY,sZ,newObstMap,xm,ym)
+
+    # =============================================================================
+    # Set inicial point and final point
+    # =============================================================================
+    # Vector with the position and orientation from the arm's base to the
+    # end-effector's initial position
+    qi = joints[-1,:]
+
+    # Transformation from the arm's base to the end-effector's initial position
+    Tbp = MCD(qi)
+    Rini = trans2pos(Tbp,elbow)
+
+    # Orientation of the arm's base
+    alpha = effectorBaseHeading[0,2] # Rz
+    beta = math.pi/2+effectorBaseHeading[0,1] # Ry
+    gamma = effectorBaseHeading[0,0] # Rx
+
+    ca = math.cos(alpha)
+    cb = math.cos(beta)
+    cg = math.cos(gamma)
+    sa = math.sin(alpha)
+    sb = math.sin(beta)
+    sg = math.sin(gamma)
+
+    # Transformation from the origin to the arm's base
+    Tob = [[ca*cb, ca*sb*sg-sa*cg, ca*sb*cg+sa*sg, effectorBasePath[0,0]],
+           [sa*cb, sa*sb*sg+ca*cg, sa*sb*cg-ca*sg, effectorBasePath[0,1]],
+           [-sb, cb*sg, cb*cg, effectorBasePath[0,2]],
+           [0, 0, 0, 1]]
+
+
+    # Transformation from the origin to the end-effector's initial position
+    Top = dot(Tob,Tbp)
+
+    # Initial position of the end-effector
+    xini = Top[0,3]
+    yini = Top[1,3]
+    zini = Top[2,3]
+
+    # Nodes with the initial and final end-effector's positions
+    #initialWayPointArm = [int(np.round(xini/resX)) , int(np.round(yini/resY)), int(np.round(zini/resZ))]
+    initialWayPointArm = np.uint32(np.round([xini/resX , yini/resY, zini/resZ]))
+    #finalWayPointArm = [int(np.round(xmNew/resX)) , int(np.round(ymNew/resY)), int(np.round(zmNew/resZ))]
+    finalWayPointArm = np.uint32(np.round([xmNew/resX , ymNew/resY , zmNew/resZ]))
+
+    # =============================================================================
+    # Generate tunnel extruding a circle
+    # =============================================================================
+    Cmap2 = TunnelCost(Rlim,rO,rm,effectorBasePath,sX,sY,sZ,resX,resY,resZ,effectorBaseHeading,finalWayPointArm,initialWayPointArm)
+
+    # Total cost map is the sum of ground, obstacles and tunnel
+    Cmap = Cmap1 * Cmap2
+
+
+
+    # =============================================================================
+    # Fast Marching 3D
+    # =============================================================================
+
+    Tmap3D = FM3D.computeTmap(Cmap,finalWayPointArm,initialWayPointArm)
+    #TmapG,TmapS,nodeJoin = FM3D.biComputeTmap(Cmap,finalWayPointArm,initialWayPointArm)
+
+
+    gamma3D = array(FM3D.getPathGDM(Tmap3D,initialWayPointArm,finalWayPointArm,0.5))
+    #pathG = FM.getPathGDM(TmapG,nodeJoin,finalWayPointArm,0.5)
+    #pathS = FM.getPathGDM(TmapS,nodeJoin,initialWayPointArm,0.5)
+
+    #gamma3D = np.vstack((np.flipud(pathS),pathG))
+
+    gamma3D[:,0] = gamma3D[:,0]*resX
+    gamma3D[:,1] = gamma3D[:,1]*resY
+    gamma3D[:,2] = gamma3D[:,2]*resZ
+
+    gamma3D[:,0] = signal.savgol_filter(gamma3D[:,0], 15, 3)
+    gamma3D[:,1] = signal.savgol_filter(gamma3D[:,1], 15, 3)
+    gamma3D[:,2] = signal.savgol_filter(gamma3D[:,2], 15, 3)
+
+    #gamma3D[:,0] = ndimage.gaussian_filter1d(gamma3D[:,0], 10)
+    #gamma3D[:,1] = ndimage.gaussian_filter1d(gamma3D[:,1], 10)
+    #gamma3D[:,2] = ndimage.gaussian_filter1d(gamma3D[:,2], 10)
+
+
+    effectorBasePath[:,0] = effectorBasePath[:,0]+Xmin
+    effectorBasePath[:,1] = effectorBasePath[:,1]+Ymin
+    effectorBasePath[:,2] = effectorBasePath[:,2]+Zmin
+
+    gamma3D[:,0] = gamma3D[:,0]+Xmin
+    gamma3D[:,1] = gamma3D[:,1]+Ymin
+    gamma3D[:,2] = gamma3D[:,2]+Zmin
+
+    gamma3D[-1,:] = [xm,ym,zm]
+
+    resizedGamma3D = np.zeros([len(finalBasePath)-index+1,3])
+
+    fx = interpolate.interp1d(range(0,len(gamma3D)),gamma3D[:,0])
+    fy = interpolate.interp1d(range(0,len(gamma3D)),gamma3D[:,1])
+    fz = interpolate.interp1d(range(0,len(gamma3D)),gamma3D[:,2])
+    resizedGamma3D[:,0] = fx(np.linspace(0,len(gamma3D)-1,len(finalBasePath)-index+1,endpoint=True))
+    resizedGamma3D[:,1] = fy(np.linspace(0,len(gamma3D)-1,len(finalBasePath)-index+1,endpoint=True))
+    resizedGamma3D[:,2] = fz(np.linspace(0,len(gamma3D)-1,len(finalBasePath)-index+1,endpoint=True))
 
 
 
@@ -1809,88 +1809,88 @@ def main(xm,ym,xr,yr,initialHeading,mapDirectory,resolution,size):
     #     Relation between end effector path and rover path
     # =============================================================================
 
-	global assignment
-	assignment = assign(resizedGamma3D,effectorBasePath,rO,Rm,Rlim)
+    global assignment
+    assignment = assign(resizedGamma3D,effectorBasePath,rO,Rm,Rlim)
 
-	effectorJoints = PathInverseKinematics(assignment,resizedGamma3D,effectorBasePath,effectorBaseHeading,qi,Rini,elbow,ryf)
+    effectorJoints = PathInverseKinematics(assignment,resizedGamma3D,effectorBasePath,effectorBaseHeading,qi,Rini,elbow,ryf)
 
-	joints = np.vstack((joints[range(0,index-1),:],effectorJoints))
-	assignment = np.hstack((array(range(0,index-1)),assignment+index-1))
+    joints = np.vstack((joints[range(0,index-1),:],effectorJoints))
+    assignment = np.hstack((array(range(0,index-1)),assignment+index-1))
 
-	r = np.zeros([len(finalBasePath),1])
-	for i in range(1,len(finalBasePath)):
-		r[i] =np.linalg.norm(finalBasePath[i,:]-finalBasePath[i-1,:])
-
-
-	t = r/v
-	tf = np.cumsum(t)
-
-	tj = np.zeros([len(assignment)])
-	aux = 0
-
-	for i in range(1,len(assignment)):
-		tj[i] = tf[assignment[i]]
-
-	tj[-1] = tf[-1]
+    r = np.zeros([len(finalBasePath),1])
+    for i in range(1,len(finalBasePath)):
+        r[i] =np.linalg.norm(finalBasePath[i,:]-finalBasePath[i-1,:])
 
 
-	global finalJoints
-	finalJoints = smoothJoints(joints,tj,qend)
+    t = r/v
+    tf = np.cumsum(t)
 
-	"""# Plot joints
-	fig, ax = plt.subplots()
-	plt.plot(tj,finalJoints[:,0],label='First joint')
-	plt.plot(tj,finalJoints[:,1],label='Second joint')
-	plt.plot(tj,finalJoints[:,2],label='Third joint')
-	plt.plot(tj,finalJoints[:,3],label='Fourth joint')
-	plt.plot(tj,finalJoints[:,4],label='Fifth joint')
-	plt.show()
-	plt.legend()
+    tj = np.zeros([len(assignment)])
+    aux = 0
+
+    for i in range(1,len(assignment)):
+        tj[i] = tf[assignment[i]]
+
+    tj[-1] = tf[-1]
+
+
+    global finalJoints
+    finalJoints = smoothJoints(joints,tj,qend)
+
+    """# Plot joints
+    fig, ax = plt.subplots()
+    plt.plot(tj,finalJoints[:,0],label='First joint')
+    plt.plot(tj,finalJoints[:,1],label='Second joint')
+    plt.plot(tj,finalJoints[:,2],label='Third joint')
+    plt.plot(tj,finalJoints[:,3],label='Fourth joint')
+    plt.plot(tj,finalJoints[:,4],label='Fifth joint')
+    plt.show()
+    plt.legend()
 
 
 
     # Surf plot fetching configuration
-	xMap= np.linspace(0,aX,sX)
-	yMap= np.linspace(0,aY,sY)
-	x,y = np.meshgrid(xMap,yMap)
+    xMap= np.linspace(0,aX,sX)
+    yMap= np.linspace(0,aY,sY)
+    x,y = np.meshgrid(xMap,yMap)
 
-	fig = plt.figure()
-	ax = fig.gca(projection='3d')
-	ax.scatter3D(resizedGamma3D[:,0],resizedGamma3D[:,1],resizedGamma3D[:,2],'g',30)
-	ax.scatter3D(effectorBasePath[-1,0],effectorBasePath[-1,1],effectorBasePath[-1,2],marker='+',s=50)
-	#plotArm(ax,qinitial,effectorBasePath[-1,:],effectorBaseHeading[-1,:])
-	#for i in range(0,len(effectorBasePath),15):
-		#plotArm(ax,effectorJoints[i,:],effectorBasePath[i,:],effectorBaseHeading[i,:])
-	plotArm(ax,qend,effectorBasePath[-1,:],effectorBaseHeading[-1,:])
-	ax.plot3D(resizedGamma3D[:,0],resizedGamma3D[:,1],resizedGamma3D[:,2], 'blue')
-	ax.plot_surface(x+Xmin,y+Ymin, ZsMap+Zmin,rstride=5, cstride=5, cmap = 'RdBu')
-	ax.set_aspect('equal')
-	plt.show()
+    fig = plt.figure()
+    ax = fig.gca(projection='3d')
+    ax.scatter3D(resizedGamma3D[:,0],resizedGamma3D[:,1],resizedGamma3D[:,2],'g',30)
+    ax.scatter3D(effectorBasePath[-1,0],effectorBasePath[-1,1],effectorBasePath[-1,2],marker='+',s=50)
+    #plotArm(ax,qinitial,effectorBasePath[-1,:],effectorBaseHeading[-1,:])
+    #for i in range(0,len(effectorBasePath),15):
+            #plotArm(ax,effectorJoints[i,:],effectorBasePath[i,:],effectorBaseHeading[i,:])
+    plotArm(ax,qend,effectorBasePath[-1,:],effectorBaseHeading[-1,:])
+    ax.plot3D(resizedGamma3D[:,0],resizedGamma3D[:,1],resizedGamma3D[:,2], 'blue')
+    ax.plot_surface(x+Xmin,y+Ymin, ZsMap+Zmin,rstride=5, cstride=5, cmap = 'RdBu')
+    ax.set_aspect('equal')
+    plt.show()
 
-	# Plot everything together
-	fig = plt.figure()
-	ax = fig.gca(projection='3d')
-	ax.plot3D(finalRoverPath[:,0],finalRoverPath[:,1],finalRoverPath[:,2],'blue')
-	ax.plot3D(finalBasePath[:,0],finalBasePath[:,1],finalBasePath[:,2],'orange')
-	for i in range(0,len(finalBasePath),10):
-		plotArm(ax,finalJoints[i,:],finalBasePath[i,:],finalBaseHeading[i,:])
-	plotArm(ax,finalJoints[-1,:],finalBasePath[-1,:],finalBaseHeading[-1,:])
-	ax.plot3D(resizedGamma3D[:,0],resizedGamma3D[:,1],resizedGamma3D[:,2], 'green')
-	ax.scatter3D(xm,ym,zm,marker='x',s=50)
-	#ax.plot_surface(Xs,Ys,Zsm,rstride=5, cstride=5, cmap = 'RdBu')
-	ax.set_aspect('equal')
-	plt.show()"""
+    # Plot everything together
+    fig = plt.figure()
+    ax = fig.gca(projection='3d')
+    ax.plot3D(finalRoverPath[:,0],finalRoverPath[:,1],finalRoverPath[:,2],'blue')
+    ax.plot3D(finalBasePath[:,0],finalBasePath[:,1],finalBasePath[:,2],'orange')
+    for i in range(0,len(finalBasePath),10):
+            plotArm(ax,finalJoints[i,:],finalBasePath[i,:],finalBaseHeading[i,:])
+    plotArm(ax,finalJoints[-1,:],finalBasePath[-1,:],finalBaseHeading[-1,:])
+    ax.plot3D(resizedGamma3D[:,0],resizedGamma3D[:,1],resizedGamma3D[:,2], 'green')
+    ax.scatter3D(xm,ym,zm,marker='x',s=50)
+    #ax.plot_surface(Xs,Ys,Zsm,rstride=5, cstride=5, cmap = 'RdBu')
+    ax.set_aspect('equal')
+    plt.show()"""
 
-	
-	
-	
-	
-	assignment = np.int32(assignment)	
-	
-	elapsedTime = time()-startTime
-	print("Elapsed execution time: " + str(elapsedTime))
-	
-	return finalRoverPath,finalRoverHeading,finalJoints,assignment
+    
+    
+    
+    
+    assignment = np.int32(assignment)	
+    
+    elapsedTime = time()-startTime
+    print("Elapsed execution time: " + str(elapsedTime))
+    
+    return finalRoverPath,finalRoverHeading,finalJoints,assignment
 
 
 
