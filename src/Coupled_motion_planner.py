@@ -1061,7 +1061,7 @@ def smoothJoints(joints,times,qend):
 
     for i in range(0,n):
         fj = interpolate.interp1d(range(0,m),ajoints[:,i])
-        tJoints[:,i] = fj(times*(m-1)/times[-1])
+        tJoints[:,i] = fj(times*(m-1.1)/times[-1])
         #tJoints[:,i] = signal.savgol_filter(tJoints[:,i], 51, 3)
         #tJoints[:,i] = signal.savgol_filter(tJoints[:,i], 3, 2)
         tJoints[:,i] = ndimage.gaussian_filter1d(tJoints[:,i], 4)
@@ -1412,7 +1412,10 @@ def main(xm,ym,xr,yr,initialHeading,mapDirectory,resolution,size):
     for i in range(0,len(subPath)):
         d = np.linalg.norm(subPath[i,:]-[xm,ym,zm])
         baseOrientation = np.arctan2((ym-subPath[i,1])/d,(xm-subPath[i,0])/d)
-        if baseOrientation-subPathHeading[i,2] < math.pi/2 and baseOrientation-subPathHeading[i,2] > 0:
+        diff = baseOrientation - subPathHeading[i,2]
+        if diff < -math.pi: diff = diff + 2*math.pi
+        if diff > math.pi: diff = diff - 2*math.pi
+        if diff < math.pi/2 and diff > 0:
             if d < rlim:
                 distCost[i] = np.inf
             elif d > Rlim:
@@ -1421,8 +1424,8 @@ def main(xm,ym,xr,yr,initialHeading,mapDirectory,resolution,size):
                 distCost[i] = 1/((rO+Rm)/2)**2*(d-((rO+Rm)/2))**2
         else:
             distCost[i] = np.inf
-
-    distCost[distCost!=np.inf] = distCost[distCost!=np.inf]/np.max(distCost[distCost!=np.inf])
+    if not np.all(distCost == np.inf):
+        distCost[distCost!=np.inf] = distCost[distCost!=np.inf]/np.max(distCost[distCost!=np.inf])
 
     # =============================================================================
     #     Cost in function of the position of the wheels
@@ -1471,6 +1474,9 @@ def main(xm,ym,xr,yr,initialHeading,mapDirectory,resolution,size):
         bestOrientation = np.arctan2((ym-roverCenterPos[1])/d,(xm-roverCenterPos[0])/d)
 
         headingCost[i] = np.abs(roverCenterHeading-bestOrientation)
+        if headingCost[i] > math.pi: headingCost[i] = headingCost[i] - 2*math.pi
+        if headingCost[i] < math.pi: headingCost[i] = headingCost[i] + 2*math.pi
+
 
 
     headingCost = headingCost/np.max(headingCost)
@@ -1478,7 +1484,7 @@ def main(xm,ym,xr,yr,initialHeading,mapDirectory,resolution,size):
     # =============================================================================
     #     Total Cost
     # =============================================================================
-    totalCost = distCost+inclCost+obstCost+headingCost
+    totalCost = 2*distCost+inclCost+obstCost+headingCost
 
 
     # =============================================================================
