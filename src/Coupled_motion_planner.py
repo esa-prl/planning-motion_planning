@@ -1535,7 +1535,7 @@ def main(xm,ym,xr,yr,initialHeading,mapDirectory,resolution,size):
 
     if zproy > zm:
         elbow = 1
-        qid = [-math.pi/2,-1.6422,1.459,2.796,0]  # Initial configuration after deployment
+        qid = [-math.pi/2,-1.6422,1.459,0.6,0]  # Initial configuration after deployment
     else:
         elbow = 0
         qid = [-math.pi/2,-0.6721,-0.5,-0.3456,0]  # Initial configuration after deployment
@@ -1781,9 +1781,9 @@ def main(xm,ym,xr,yr,initialHeading,mapDirectory,resolution,size):
     gamma3D[:,1] = gamma3D[:,1]*resY
     gamma3D[:,2] = gamma3D[:,2]*resZ
 
-    gamma3D[:,0] = signal.savgol_filter(gamma3D[:,0], 15, 3)
-    gamma3D[:,1] = signal.savgol_filter(gamma3D[:,1], 15, 3)
-    gamma3D[:,2] = signal.savgol_filter(gamma3D[:,2], 15, 3)
+    gamma3D[:,0] = signal.savgol_filter(gamma3D[:,0], 11, 3)
+    gamma3D[:,1] = signal.savgol_filter(gamma3D[:,1], 11, 3)
+    gamma3D[:,2] = signal.savgol_filter(gamma3D[:,2], 11, 3)
 
     #gamma3D[:,0] = ndimage.gaussian_filter1d(gamma3D[:,0], 10)
     #gamma3D[:,1] = ndimage.gaussian_filter1d(gamma3D[:,1], 10)
