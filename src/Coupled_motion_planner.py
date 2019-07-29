@@ -1685,7 +1685,7 @@ def main(xm, ym, xr, yr, initialHeading, mapDirectory, resolution, size):
 
     # Smoothing the final joints vector to avoid abrupt changes
     global finalJoints
-    finalJoints = smoothJoints(joints, qend)
+    finalJoints = smoothJoints(joints)
 
     # Changing from int64 to int32 as C++ uses this last one for int    
     assignment = np.int32(assignment)	
