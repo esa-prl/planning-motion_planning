@@ -1064,7 +1064,7 @@ def smoothJoints(joints):
 
     # Smoothing algorithm with a gaussian filter
     for i in range(0, n):
-        fJoints[:, i] = ndimage.gaussian_filter1d(aJoints[:, i], 4)
+        fJoints[:, i] = ndimage.gaussian_filter1d(ajoints[:, i], 4)
 
     # Ensuring the initial and final configuration are still the same
     fJoints[0, :] = ajoints[0, :]
