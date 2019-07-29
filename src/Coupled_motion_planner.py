@@ -290,6 +290,8 @@ def deploymentStage(qid, qend, index, qinitial):
 
     # Function that returns a vector with the configurations of the arm during the deployment stage
 
+    qid[0] = math.pi*0.99999/2
+
     # Initialazing the joint's positions matrix in the deployment stage
     joints = np.zeros((index, len(qinitial)))
 
