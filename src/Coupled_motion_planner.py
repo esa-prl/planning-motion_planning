@@ -305,7 +305,7 @@ def deploymentStage(qid, qend, index, qinitial):
     inc = np.ones((len(qinitial), 1))
 
     for i in range(0, len(qinitial)):
-        angleDiff = qi[i] - qinitial[i]
+        angleDiff = qid[i] - qinitial[i]
         inc[i] = angleDiff/(index - 1)
 
     for i in range(1, index - 1):
