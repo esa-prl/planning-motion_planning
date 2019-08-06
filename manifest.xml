@@ -7,19 +7,10 @@
   <url>http://</url>
   <logo>http://</logo>
   <depend package="base/cmake" />
-  <!--
-   To add any dependencies use the depend tag
-  <depend package="dummy-dependency-0" />
-	...
-  <depend package="dummy-dependency-n-1" />
-  <depend package="dummy-dependency-n" />
-  -->
   <depend package="base/types" />
   <depend package="base/orogen/types"/>
   <depend package="orogen"/>
   <depend package="slam/orogen/envire" />
-  <!--
-  <depend package="/usr/include/python3.5m"/>
-  <depend package="/usr/lib/python3/dist-packages/numpy/core/include/numpy"/>
-	-->
+  <depend package="python3.5"/>
+  <depend package="python3-numpy"/>
 </package>
