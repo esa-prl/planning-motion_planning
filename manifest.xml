@@ -11,6 +11,6 @@
   <depend package="base/orogen/types"/>
   <depend package="orogen"/>
   <depend package="slam/orogen/envire" />
-  <depend package="python3.8-dev"/>
+  <depend package="python3-dev"/>
   <depend package="python3-numpy"/>
 </package>
